@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conyx — ERP Contábil</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ══════════════════════════════════════
+   CONYX — LOGIN PAGE
+══════════════════════════════════════ */
+#login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── FULL BACKGROUND ── */
+.lp-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #010f1e 0%, #021B33 45%, #012a4a 100%);
+}
+
+/* Animated glow blobs */
+.lp-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .35;
+  animation: blobDrift 12s ease-in-out infinite alternate;
+}
+.lp-blob-1 { width: 600px; height: 500px; background: radial-gradient(circle, #0e7ef7 0%, transparent 70%); top: -150px; left: -100px; animation-delay: 0s; }
+.lp-blob-2 { width: 400px; height: 400px; background: radial-gradient(circle, #10b981 0%, transparent 70%); bottom: -80px; left: 20%; animation-delay: -4s; }
+.lp-blob-3 { width: 300px; height: 300px; background: radial-gradient(circle, #3b9eff 0%, transparent 70%); top: 30%; right: 50%; animation-delay: -8s; opacity: .18; }
+@keyframes blobDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, -20px) scale(1.08); }
+}
+
+/* Dot grid */
+.lp-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(59,158,255,.18) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, rgba(0,0,0,.7) 0%, transparent 100%);
+}
+
+/* Wave bottom decoration */
+.lp-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.lp-wave svg { width: 100%; height: 100%; opacity: .12; }
+
+/* ── LEFT PANEL ── */
+.lp-left {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 64px;
+}
+
+/* Logo */
+.lp-logo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 52px;
+  animation: fadeSlideUp .7s ease both;
+}
+.lp-logo-name {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  color: #fff;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.lp-logo-name .cx { color: #0e7ef7; }
+.lp-logo-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.lp-logo-sub .dash {
+  width: 32px;
+  height: 2px;
+  background: linear-gradient(90deg, #0e7ef7, #10b981);
+  border-radius: 2px;
+}
+.lp-logo-sub span {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #3b9eff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Headline */
+.lp-headline {
+  animation: fadeSlideUp .7s ease .1s both;
+}
+.lp-headline h1 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  line-height: 1.1;
+  color: #fff;
+  letter-spacing: -1.5px;
+  margin-bottom: 22px;
+}
+.lp-headline h1 .hl {
+  background: linear-gradient(90deg, #0e7ef7, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.lp-headline p {
+  font-size: .92rem;
+  color: rgba(255,255,255,.55);
+  line-height: 1.78;
+  max-width: 420px;
+}
+
+/* Security badge */
+.lp-security {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 52px;
+  animation: fadeSlideUp .7s ease .2s both;
+}
+.lp-sec-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(16,185,129,.4);
+  background: rgba(16,185,129,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.lp-sec-text strong {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: #10b981;
+}
+.lp-sec-text span {
+  font-size: .74rem;
+  color: rgba(255,255,255,.4);
+}
+
+/* ── RIGHT PANEL ── */
+.lp-right {
+  width: 480px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 44px;
+}
+
+/* Card */
+.lp-card {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  padding: 42px 38px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: fadeSlideUp .7s ease .15s both;
+}
+
+/* Lock icon */
+.lp-lock {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0e4a8a, #0e7ef7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 22px;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 24px rgba(14,126,247,.35);
+}
+
+.lp-card-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.lp-card-header h2 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: #fff;
+  letter-spacing: -.3px;
+}
+.lp-card-header p {
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+  margin-top: 5px;
+}
+
+/* Fields */
+.lp-field { margin-bottom: 16px; }
+.lp-label {
+  display: block;
+  font-size: .74rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 7px;
+}
+.lp-input-wrap { position: relative; }
+.lp-input-wrap .lp-ico {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: .85rem;
+  opacity: .45;
+  pointer-events: none;
+}
+.lp-input {
+  width: 100%;
+  padding: 13px 14px 13px 40px;
+  background: rgba(255,255,255,.07);
+  border: 1.5px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .85rem;
+  color: #fff;
+  outline: none;
+  transition: all .2s;
+}
+.lp-input::placeholder { color: rgba(255,255,255,.3); }
+.lp-input:focus {
+  border-color: rgba(14,126,247,.7);
+  background: rgba(14,126,247,.08);
+  box-shadow: 0 0 0 3px rgba(14,126,247,.15);
+}
+.lp-input.error { border-color: rgba(239,68,68,.7); box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
+.lp-toggle-pw {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,.35);
+  font-size: .85rem;
+  padding: 2px;
+  transition: color .15s;
+}
+.lp-toggle-pw:hover { color: rgba(255,255,255,.7); }
+
+.lp-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  margin-top: -4px;
+}
+.lp-remember { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.lp-remember input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #0e7ef7;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.lp-remember span { font-size: .76rem; color: rgba(255,255,255,.55); }
+.lp-forgot { font-size: .76rem; color: #3b9eff; font-weight: 600; cursor: pointer; transition: color .15s; }
+.lp-forgot:hover { color: #10b981; }
+
+/* Main button */
+.lp-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #0e7ef7, #10b981);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .3px;
+  position: relative;
+  overflow: hidden;
+  transition: all .2s;
+  box-shadow: 0 4px 20px rgba(14,126,247,.35);
+}
+.lp-btn:hover { opacity: .92; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(14,126,247,.45); }
+.lp-btn:active { transform: translateY(0); }
+.lp-btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.lp-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+/* Divider */
+.lp-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.lp-divider::before, .lp-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+.lp-divider span { font-size: .7rem; color: rgba(255,255,255,.3); white-space: nowrap; }
+
+/* Google button */
+.lp-google-btn {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .84rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all .2s;
+}
+.lp-google-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); }
+.lp-google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Contact admin */
+.lp-contact {
+  text-align: center;
+  margin-top: 20px;
+  font-size: .74rem;
+  color: rgba(255,255,255,.3);
+}
+.lp-contact a { color: #3b9eff; font-weight: 600; cursor: pointer; text-decoration: none; }
+.lp-contact a:hover { color: #10b981; }
+
+/* Error msg */
+.lp-error-msg {
+  display: none;
+  background: rgba(239,68,68,.12);
+  border: 1px solid rgba(239,68,68,.3);
+  color: #fca5a5;
+  font-size: .76rem;
+  font-weight: 600;
+  padding: 10px 13px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: shake .35s ease;
+}
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+/* Shared animations */
+@keyframes fadeSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* Transitions */
+#login-overlay.exit { animation: loginFadeOut .45s ease forwards; }
+@keyframes loginFadeOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(.97)} }
+#erp-app { opacity: 0; transition: opacity .45s ease .3s; width: 100%; height: 100vh; overflow: hidden; position: relative; }
+#erp-app.visible { opacity: 1; }
+
+@media (max-width: 860px) { .lp-left { display: none; } .lp-right { width: 100%; } }
+</style>
+<style>
+:root {
+  --navy:#021B33; --navy2:#03264d; --navy3:#0a3a5c;
+  --accent:#0e7ef7; --accent2:#3b9eff;
+  --white:#fff; --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0;
+  --g300:#cbd5e1; --g400:#94a3b8; --g500:#64748b; --g600:#475569; --g700:#334155; --g800:#1e293b;
+  --red:#ef4444; --redl:#fef2f2; --redb:#fecaca;
+  --yellow:#f59e0b; --yell:#fffbeb; --yellb:#fde68a;
+  --green:#10b981; --greenl:#ecfdf5; --greenb:#a7f3d0;
+  --orange:#f97316; --orgl:#fff7ed; --orgb:#fed7aa;
+  --purple:#8b5cf6; --purpl:#f5f3ff;
+  --sw:240px; --r:10px; --rl:16px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shm:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+  --shl:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'DM Sans',sans-serif;background:var(--g50);color:var(--g800);height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ─────────────────────────── */
+#sidebar{width:var(--sw);background:var(--navy);display:flex;flex-direction:column;height:100vh;flex-shrink:0;z-index:10}
+.sl-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sl-logo .brand{font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;letter-spacing:-.5px}
+.sl-logo .brand span{color:var(--accent2)}
+.sl-logo .tag{font-size:.68rem;color:rgba(255,255,255,.35);margin-top:2px}
+.sl-nav{flex:1;padding:10px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;font-size:.82rem;font-weight:500;border-left:3px solid transparent;user-select:none}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-item.active{color:#fff;background:rgba(14,126,247,.18);border-left-color:var(--accent2)}
+.nav-item .ni{width:18px;text-align:center;font-size:.95rem;flex-shrink:0}
+.nav-item .nb{margin-left:auto;background:var(--red);color:#fff;font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:20px;min-width:20px;text-align:center}
+.sl-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.u-info{display:flex;align-items:center;gap:10px}
+.u-av{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.78rem;flex-shrink:0}
+.u-name{font-size:.78rem;font-weight:600;color:#fff}
+.u-role{font-size:.68rem;color:rgba(255,255,255,.35)}
+.role-badge{display:inline-block;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(14,126,247,.3);color:var(--accent2);margin-left:6px}
+
+/* ── MAIN ─────────────────────────────── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:1px solid var(--g200);padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
+.tb-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;color:var(--navy);white-space:nowrap}
+.tb-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:22px 26px}
+
+/* ── BUTTONS ─────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:600;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-secondary:hover{background:var(--g200)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#dc2626}
+.btn-ghost{background:transparent;color:var(--g500);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g100)}
+.btn-sm{padding:5px 11px;font-size:.72rem}
+.btn-xs{padding:3px 8px;font-size:.68rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── SECTIONS ────────────────────────── */
+.section{display:none}.section.active{display:block}
+
+/* ── CARD ────────────────────────────── */
+.card{background:#fff;border-radius:var(--rl);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-title{font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;color:var(--navy);white-space:nowrap}
+.card-body{padding:18px}
+
+/* ── STATS ───────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:var(--rl);border:1px solid var(--g200);padding:16px 18px;box-shadow:var(--sh)}
+.stat-card .sl{font-size:.68rem;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-card .sv{font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--navy);line-height:1}
+.stat-card .ss{font-size:.68rem;color:var(--g400);margin-top:3px}
+.stat-card.danger .sv{color:var(--red)}.stat-card.warning .sv{color:var(--yellow)}.stat-card.success .sv{color:var(--green)}
+
+/* ── TABLE ───────────────────────────── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--g50)}
+th{padding:9px 13px;text-align:left;font-size:.68rem;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--g200);white-space:nowrap}
+td{padding:10px 13px;border-bottom:1px solid var(--g100);font-size:.8rem;color:var(--g700);vertical-align:middle}
+tr:hover td{background:var(--g50)}
+tr:last-child td{border-bottom:none}
+
+/* ── BADGES ──────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:.68rem;font-weight:700;white-space:nowrap;gap:4px}
+.bg{background:var(--greenl);color:#065f46;border:1px solid var(--greenb)}
+.by{background:var(--yell);color:#92400e;border:1px solid var(--yellb)}
+.br{background:var(--redl);color:#991b1b;border:1px solid var(--redb)}
+.bb{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.bgr{background:var(--g100);color:var(--g600);border:1px solid var(--g200)}
+.bo{background:var(--orgl);color:#c2410c;border:1px solid var(--orgb)}
+.bp{background:var(--purpl);color:#5b21b6;border:1px solid #ddd6fe}
+
+/* ── FILTER BAR ──────────────────────── */
+.fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.si{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:6px 11px;flex:1;min-width:180px;max-width:280px}
+.si input{border:none;outline:none;font-family:inherit;font-size:.8rem;width:100%;color:var(--g700)}
+.si span{color:var(--g400);font-size:.85rem}
+select.fs{border:1px solid var(--g200);border-radius:var(--r);padding:6px 11px;font-family:inherit;font-size:.8rem;background:#fff;color:var(--g700);cursor:pointer;outline:none}
+
+/* ── MODAL ───────────────────────────── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
+.mo.open{display:flex}
+.md{background:#fff;border-radius:var(--rl);box-shadow:var(--shl);width:100%;max-width:640px;max-height:90vh;overflow-y:auto;animation:mdIn .18s ease}
+@keyframes mdIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.md-h{padding:18px 22px 14px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.md-h h3{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--navy)}
+.md-x{background:var(--g100);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.95rem;color:var(--g500);display:flex;align-items:center;justify-content:center}
+.md-b{padding:18px 22px}
+.md-f{padding:14px 22px;border-top:1px solid var(--g100);display:flex;gap:8px;justify-content:flex-end}
+
+/* ── FORM ────────────────────────────── */
+.fg{margin-bottom:14px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fl{display:block;font-size:.74rem;font-weight:600;color:var(--g600);margin-bottom:4px}
+.fl .req{color:var(--red)}
+.fc{width:100%;padding:7px 11px;border:1px solid var(--g200);border-radius:var(--r);font-family:inherit;font-size:.8rem;color:var(--g800);outline:none;transition:border .15s;background:#fff}
+.fc:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,126,247,.1)}
+.fc.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+textarea.fc{resize:vertical;min-height:70px}
+.err-msg{font-size:.7rem;color:var(--red);margin-top:3px;display:none}
+.fc.err + .err-msg{display:block}
+.fst{font-size:.68rem;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--g100)}
+.chip-group{display:flex;flex-wrap:wrap;gap:7px}
+.chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border:1px solid var(--g200);border-radius:20px;cursor:pointer;font-size:.75rem;transition:all .15s;user-select:none}
+.chip input{display:none}
+.chip.on{background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:600}
+
+/* ── TABS ────────────────────────────── */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--g200);margin-bottom:18px;overflow-x:auto}
+.tab{padding:9px 16px;font-size:.78rem;font-weight:600;color:var(--g400);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--g700)}
+.tab.active{color:var(--navy);border-bottom-color:var(--accent)}
+.tab .tc{background:var(--red);color:#fff;font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+.tab .tc.ok{background:var(--g300)}
+
+/* ── PROGRESS ────────────────────────── */
+.pb{background:var(--g200);border-radius:20px;height:7px;overflow:hidden}
+.pf{height:100%;border-radius:20px;transition:width .3s}
+.pf.g{background:var(--green)}.pf.y{background:var(--yellow)}.pf.r{background:var(--red)}.pf.b{background:var(--accent)}
+
+/* ── TIMELINE ────────────────────────── */
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--g200)}
+.tli{position:relative;padding-bottom:18px}
+.tld{position:absolute;left:-22px;top:4px;width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+.tld.green{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+.tld.red{background:var(--red);box-shadow:0 0 0 2px var(--red)}
+.tldate{font-size:.68rem;color:var(--g400);font-weight:600;margin-bottom:3px}
+.tlbox{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:10px 13px}
+.tltype{font-size:.65rem;font-weight:700;color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.tlbox p{font-size:.78rem;color:var(--g700);line-height:1.55}
+.tlnext{font-size:.72rem;color:var(--green);font-weight:600;margin-top:5px}
+
+/* ── TASK ITEM ───────────────────────── */
+.ti{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--g100)}
+.ti:last-child{border-bottom:none}
+.tck{width:20px;height:20px;border:2px solid var(--g300);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;font-size:.7rem}
+.tck.done{background:var(--green);border-color:var(--green);color:#fff}
+.tck.vencido{border-color:var(--red)}
+.tinfo{flex:1}
+.tname{font-size:.8rem;font-weight:600;color:var(--g800)}
+.tname.done{text-decoration:line-through;color:var(--g400)}
+.tmeta{font-size:.68rem;color:var(--g400);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+.tmeta .ov{color:var(--red);font-weight:700}
+.tmeta .ok{color:var(--green);font-weight:700}
+
+/* ── SECTOR BARS ─────────────────────── */
+.sbi{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)}
+.sbi:last-child{border-bottom:none}
+.sbn{font-size:.75rem;font-weight:600;width:130px;flex-shrink:0;color:var(--g700)}
+.sbt{flex:1;background:var(--g200);border-radius:20px;height:6px}
+.sbf{height:6px;border-radius:20px;background:var(--accent)}
+.sbc{font-size:.75rem;font-weight:700;color:var(--g700);width:36px;text-align:right}
+.sblate{font-size:.7rem;color:var(--red);font-weight:700;width:52px;text-align:right}
+
+/* ── ALERTS ──────────────────────────── */
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ai{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r);border-left:4px solid}
+.ai.red{background:var(--redl);border-color:var(--red)}
+.ai.yellow{background:var(--yell);border-color:var(--yellow)}
+.aico{font-size:1.3rem;flex-shrink:0}
+.atxt strong{font-size:.78rem;font-weight:700;display:block}
+.atxt span{font-size:.7rem;color:var(--g500)}
+
+/* ── SUMMARY ROW ─────────────────────── */
+.sr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g50);border-radius:var(--r);border:1px solid var(--g200);margin-bottom:8px}
+.sr:last-child{margin-bottom:0}
+.srico{font-size:1.4rem;flex-shrink:0}
+.srinfo strong{font-size:.78rem;font-weight:700;display:block;color:var(--g800)}
+.srinfo span{font-size:.7rem;color:var(--g400)}
+.srinfo{flex:1}
+
+/* ── GRIDS ───────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:20px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:18px;margin-bottom:20px}
+
+/* ── PAGE HEADER ─────────────────────── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:10px}
+.ph h2{font-family:'Sora',sans-serif;font-weight:700;font-size:1.25rem;color:var(--navy)}
+.ph p{font-size:.78rem;color:var(--g400);margin-top:2px}
+
+/* ── BACK BTN ────────────────────────── */
+.bk{display:inline-flex;align-items:center;gap:5px;color:var(--accent);font-size:.78rem;font-weight:600;cursor:pointer;margin-bottom:14px;background:none;border:none;padding:0;font-family:inherit}
+.bk:hover{color:var(--navy)}
+
+/* ── PROFILE HEADER ──────────────────── */
+.prof-h{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);padding:22px 26px;color:#fff;border-radius:var(--rl) var(--rl) 0 0}
+.prof-h h2{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800}
+.prof-meta{display:flex;gap:18px;margin-top:8px;flex-wrap:wrap}
+.prof-meta span{font-size:.74rem;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px}
+.prof-meta strong{color:#fff}
+
+/* ── CONFIG NAV ──────────────────────── */
+.cnav{display:flex;flex-direction:column;gap:2px}
+.cnav-item{padding:8px 13px;border-radius:var(--r);cursor:pointer;font-size:.8rem;font-weight:500;color:var(--g600);transition:all .15s}
+.cnav-item:hover{background:var(--g100);color:var(--navy)}
+.cnav-item.active{background:#eff6ff;color:var(--accent);font-weight:700}
+
+/* ── PRICING RESULT ──────────────────── */
+.pres{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);border-radius:var(--rl);padding:26px;color:#fff;text-align:center}
+.pres .val{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:-1px}
+.pres .lbl{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:3px}
+.pres .factors{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.pres .fac{background:rgba(255,255,255,.12);border-radius:7px;padding:7px 14px;font-size:.74rem}
+
+/* ── REPORT ──────────────────────────── */
+.rp-cov{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);padding:36px;color:#fff;text-align:center}
+.rp-cov h2{font-family:'Sora',sans-serif;font-size:1.7rem;font-weight:800;margin-bottom:6px}
+
+/* ── TOAST ───────────────────────────── */
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r);box-shadow:var(--shl);font-size:.8rem;font-weight:500;animation:toastIn .2s ease;min-width:240px;max-width:320px}
+@keyframes toastIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.toast.success{background:#fff;border-left:4px solid var(--green);color:var(--g800)}
+.toast.error{background:#fff;border-left:4px solid var(--red);color:var(--g800)}
+.toast.info{background:#fff;border-left:4px solid var(--accent);color:var(--g800)}
+.toast.warning{background:#fff;border-left:4px solid var(--yellow);color:var(--g800)}
+.toast .tico{font-size:1rem}
+
+/* ── ACCESS DENIED ───────────────────── */
+.access-denied{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+.access-denied .icon{font-size:3rem;margin-bottom:12px}
+.access-denied h3{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:8px}
+.access-denied p{font-size:.82rem;color:var(--g500);max-width:340px;line-height:1.6}
+
+/* ── THERMO ──────────────────────────── */
+.thm{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+.thm.g{background:var(--greenl);color:#065f46}
+.thm.y{background:var(--yell);color:#92400e}
+.thm.r{background:var(--redl);color:#991b1b}
+
+/* ── DISABLED SECTION ────────────────── */
+.sec-coming{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;text-align:center;background:var(--g50);border-radius:var(--rl);border:2px dashed var(--g300)}
+.sec-coming .ci{font-size:2.5rem;margin-bottom:10px}
+.sec-coming h4{font-family:'Sora',sans-serif;font-weight:700;color:var(--g500);margin-bottom:5px}
+.sec-coming p{font-size:.78rem;color:var(--g400)}
+
+/* ── EMPTY ───────────────────────────── */
+.empty{text-align:center;padding:36px;color:var(--g400)}
+.empty .ei{font-size:2.2rem;margin-bottom:8px}
+.empty p{font-size:.82rem}
+
+/* ── CHART ───────────────────────────── */
+.ch{position:relative;height:200px}
+
+/* ── SCROLLBAR ───────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--g300);border-radius:10px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN OVERLAY — CONYX
+══════════════════════════════════════ -->
+<div id="login-overlay">
+
+  <!-- Background layers -->
+  <div class="lp-bg"></div>
+  <div class="lp-blob lp-blob-1"></div>
+  <div class="lp-blob lp-blob-2"></div>
+  <div class="lp-blob lp-blob-3"></div>
+  <div class="lp-grid"></div>
+  <div class="lp-wave">
+    <svg viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#0e7ef7" d="M0,160 C240,220 480,60 720,120 C960,180 1200,40 1440,100 L1440,220 L0,220 Z"/>
+      <path fill="#10b981" opacity=".5" d="M0,180 C360,120 720,200 1080,140 C1260,110 1380,170 1440,160 L1440,220 L0,220 Z"/>
+    </svg>
+  </div>
+
+  <!-- Left: Branding -->
+  <div class="lp-left">
+    <div class="lp-logo">
+      <div class="lp-logo-name">Cony<span class="cx">x</span></div>
+      <div class="lp-logo-sub">
+        <div class="dash"></div>
+        <span>ERP Contábil</span>
+      </div>
+    </div>
+    <div class="lp-headline">
+      <h1>Controle total da<br><span class="hl">operação contábil</span></h1>
+      <p>A plataforma completa para escritórios contábeis gerenciarem sua operação com inteligência, precisão e eficiência.</p>
+    </div>
+    <div class="lp-security">
+      <div class="lp-sec-icon">🛡️</div>
+      <div class="lp-sec-text">
+        <strong>Sistema 100% seguro</strong>
+        <span>Seus dados protegidos com tecnologia de ponta</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Login card -->
+  <div class="lp-right">
+    <div class="lp-card">
+
+      <div class="lp-lock">🔒</div>
+
+      <div class="lp-card-header">
+        <h2>Bem-vindo ao Conyx</h2>
+        <p>Faça login para acessar sua conta</p>
+      </div>
+
+      <div id="lp-error" class="lp-error-msg">E-mail ou senha inválidos. Tente novamente.</div>
+
+      <div class="lp-field">
+        <label class="lp-label" for="lp-email">E-mail ou usuário</label>
+        <div class="lp-input-wrap">
+          <span class="lp-ico">👤</span>
+          <input class="lp-input" id="lp-email" type="email" placeholder="Digite seu e-mail ou usuário" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="lp-field">
+        <label class="lp-label" for="lp-senha">Senha</label>
+        <div class="lp-input-wrap">
+          <span class="lp-ico">🔒</span>
+          <input class="lp-input" id="lp-senha" type="password" placeholder="Digite sua senha" autocomplete="current-password">
+          <button class="lp-toggle-pw" type="button" onclick="togglePw()" id="lp-pw-eye" title="Mostrar senha">👁️</button>
+        </div>
+      </div>
+
+      <div class="lp-options">
+        <label class="lp-remember">
+          <input type="checkbox" id="lp-remember">
+          <span>Lembrar-me</span>
+        </label>
+        <span class="lp-forgot" onclick="lpForgot()">Esqueci minha senha</span>
+      </div>
+
+      <button class="lp-btn" id="lp-submit" onclick="doLogin()">
+        <div class="lp-spinner" id="lp-spinner"></div>
+        <div class="lp-btn-inner" id="lp-btn-text">Entrar</div>
+      </button>
+
+      <div class="lp-divider"><span>ou</span></div>
+
+      <button class="lp-google-btn" onclick="toast('Login com Google em breve!','info')">
+        <svg class="lp-google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Entrar com Google
+      </button>
+
+      <div class="lp-contact">
+        Ainda não tem uma conta? <a onclick="toast('Entre em contato com o administrador do sistema.','info')">Fale com o administrador</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ERP APP (hidden until login)
+══════════════════════════════════════ -->
+<div id="erp-app" style="display:none">
+<div id="toast-container"></div>
+<div style="display:flex;height:100vh;overflow:hidden">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sl-logo">
+    <div class="brand">Cony<span>x</span></div>
+    <div class="tag">ERP Contábil</div>
+  </div>
+  <nav class="sl-nav">
+    <div class="nav-item active" data-sec="dashboard" onclick="go('dashboard')"><span class="ni">📊</span>Dashboard</div>
+    <div class="nav-item" data-sec="clientes" onclick="go('clientes')"><span class="ni">👥</span>Clientes</div>
+    <div class="nav-item" data-sec="onboarding" onclick="go('onboarding')"><span class="ni">🚀</span>Onboarding<span class="nb">7</span></div>
+    <div class="nav-item" data-sec="relacionamento" onclick="go('relacionamento')"><span class="ni">💬</span>Relacionamento<span class="nb">4</span></div>
+    <div class="nav-item" data-sec="offboarding" onclick="go('offboarding')"><span class="ni">🔄</span>Offboarding</div>
+    <div class="nav-item" data-sec="precificacao" onclick="go('precificacao')"><span class="ni">💰</span>Precificação</div>
+    <div class="nav-item" data-sec="relatorios" onclick="go('relatorios')"><span class="ni">📄</span>Relatórios</div>
+    <div class="nav-item" data-sec="configuracoes" onclick="go('configuracoes')"><span class="ni">⚙️</span>Configurações</div>
+  </nav>
+  <div class="sl-foot">
+    <div class="u-info">
+      <div class="u-av" id="user-av">RC</div>
+      <div>
+        <div class="u-name" id="user-name">Ricardo Costa</div>
+        <div class="u-role" id="user-role">Administrador <span class="role-badge" id="user-role-badge">Admin</span></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <header class="topbar">
+    <div class="tb-title" id="tb-title">Dashboard</div>
+    <div class="tb-actions">
+      <select class="fs" id="role-switcher" onchange="switchRole(this.value)" title="Simular perfil de acesso">
+        <option value="admin">👑 Admin</option>
+        <option value="gestor">🎯 Gestor</option>
+        <option value="fiscal">📋 Fiscal</option>
+        <option value="colaborador">👤 Colaborador</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('mo-interaction')">💬 Interação</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('mo-new-client')">+ Novo Cliente</button>
+    </div>
+  </header>
+  <div id="content">
+
+<!-- ════════════════════════════════
+     DASHBOARD
+════════════════════════════════ -->
+<section id="sec-dashboard" class="section active">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="sl">Clientes Ativos</div><div class="sv">412</div><div class="ss">↑ 3 este mês</div></div>
+    <div class="stat-card warning"><div class="sl">Em Onboarding</div><div class="sv">18</div><div class="ss">7 com atraso</div></div>
+    <div class="stat-card danger"><div class="sl">Em Atenção</div><div class="sv">23</div><div class="ss">Requer ação</div></div>
+    <div class="stat-card"><div class="sl">Em Offboarding</div><div class="sv">5</div><div class="ss">2 atrasados</div></div>
+    <div class="stat-card"><div class="sl">Tarefas em Aberto</div><div class="sv">147</div><div class="ss">Todos os setores</div></div>
+    <div class="stat-card danger"><div class="sl">Tarefas Atrasadas</div><div class="sv">31</div><div class="ss">↑ 5 esta semana</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><div class="card-title">🚨 Alertas Operacionais</div><span style="font-size:.7rem;color:var(--g400)">Atualizado agora</span></div>
+    <div class="card-body">
+      <div class="alert-grid">
+        <div class="ai red"><span class="aico">⏰</span><div class="atxt"><strong>31 tarefas atrasadas</strong><span>Fiscal, DP e Contábil</span></div></div>
+        <div class="ai red"><span class="aico">📂</span><div class="atxt"><strong>14 docs pendentes</strong><span>Clientes sem envio</span></div></div>
+        <div class="ai red"><span class="aico">🚧</span><div class="atxt"><strong>7 onboardings travados</strong><span>Mais de 15 dias parados</span></div></div>
+        <div class="ai yellow"><span class="aico">📅</span><div class="atxt"><strong>8 obrigações próximas</strong><span>Vencimento em 3 dias</span></div></div>
+        <div class="ai yellow"><span class="aico">👤</span><div class="atxt"><strong>9 sem contato +30d</strong><span>Clientes em risco</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-header"><div class="card-title">Clientes por Status</div></div><div class="card-body"><div class="ch"><canvas id="ch-status"></canvas></div></div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Tarefas por Status</div></div><div class="card-body"><div class="ch"><canvas id="ch-tasks"></canvas></div></div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Volume por Setor</div></div>
+      <div class="card-body">
+        <div class="sbi"><div class="sbn">⚖️ Fiscal</div><div class="sbt"><div class="sbf" style="width:78%"></div></div><div class="sbc">58</div><div class="sblate">12 ⚠️</div></div>
+        <div class="sbi"><div class="sbn">👷 Dep. Pessoal</div><div class="sbt"><div class="sbf" style="width:55%;background:#8b5cf6"></div></div><div class="sbc">41</div><div class="sblate">8 ⚠️</div></div>
+        <div class="sbi"><div class="sbn">📒 Contábil</div><div class="sbt"><div class="sbf" style="width:42%;background:#10b981"></div></div><div class="sbc">31</div><div class="sblate">6 ⚠️</div></div>
+        <div class="sbi"><div class="sbn">🏢 Societário</div><div class="sbt"><div class="sbf" style="width:22%;background:#f59e0b"></div></div><div class="sbc">16</div><div class="sblate">3 ⚠️</div></div>
+        <div class="sbi"><div class="sbn">💳 Financeiro</div><div class="sbt"><div class="sbf" style="width:3%;background:#ef4444"></div></div><div class="sbc">1</div><div class="sblate">2 ⚠️</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚠️ Clientes que Exigem Atenção</div></div>
+      <div class="card-body" style="padding:10px 18px">
+        <table>
+          <thead><tr><th>Cliente</th><th>Status</th><th>Problema</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Padaria Estrela</strong></td><td><span class="badge br">Risco</span></td><td style="font-size:.72rem">Sem contato há 45 dias</td></tr>
+            <tr><td><strong>Tech Solutions ME</strong></td><td><span class="badge by">Atenção</span></td><td style="font-size:.72rem">Docs pendentes há 12 dias</td></tr>
+            <tr><td><strong>Construtora ABC</strong></td><td><span class="badge br">Risco</span></td><td style="font-size:.72rem">Onboarding parado 20d</td></tr>
+            <tr><td><strong>Maria Costura MEI</strong></td><td><span class="badge by">Atenção</span></td><td style="font-size:.72rem">3 tarefas atrasadas</td></tr>
+            <tr><td><strong>Grupo Nexus</strong></td><td><span class="badge br">Offboarding</span></td><td style="font-size:.72rem">Processo incompleto</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">📈 Produtividade</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:center">
+        <div><div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--green)">14</div><div style="font-size:.74rem;color:var(--g400);margin-top:3px">Tarefas concluídas hoje</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--accent)">73</div><div style="font-size:.74rem;color:var(--g400);margin-top:3px">Concluídas esta semana</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:var(--navy)">2,4d</div><div style="font-size:.74rem;color:var(--g400);margin-top:3px">Tempo médio de conclusão</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     CLIENTES
+════════════════════════════════ -->
+<section id="sec-clientes" class="section">
+
+  <!-- PROFILE VIEW -->
+  <div id="view-profile" style="display:none">
+    <button class="bk" onclick="showList()">← Voltar a Clientes</button>
+    <div class="card" style="margin-bottom:0">
+      <div class="prof-h" id="prof-h">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <h2 id="pf-name"></h2>
+            <div class="prof-meta">
+              <span>🔢 <strong id="pf-cnpj"></strong></span>
+              <span>📋 <strong id="pf-regime"></strong></span>
+              <span>📥 <strong id="pf-origem"></strong></span>
+              <span>👤 <strong id="pf-resp"></strong></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center">
+            <span class="badge" id="pf-status"></span>
+            <button class="btn btn-secondary btn-sm" style="border-color:rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.1)" onclick="editCurrentClient()">✏️ Editar</button>
+          </div>
+        </div>
+        <div id="pf-mods" style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap"></div>
+      </div>
+      <!-- Dept tabs -->
+      <div style="padding:0 22px;background:#fff">
+        <div class="tab-bar" id="dept-tabs" style="margin-bottom:0"></div>
+      </div>
+      <div class="card-body" id="dept-panel"></div>
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="view-list">
+    <div class="ph">
+      <div><h2>Clientes</h2><p>Base central · <span id="client-count">412</span> clientes cadastrados</p></div>
+      <button class="btn btn-primary" onclick="openModal('mo-new-client')">+ Novo Cliente</button>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="fbar" style="flex:1">
+          <div class="si"><span>🔍</span><input id="search-cl" type="text" placeholder="Buscar por nome ou CNPJ..." oninput="filterClients()"></div>
+          <select class="fs" id="flt-regime" onchange="filterClients()"><option value="">Todos os regimes</option><option>Simples Nacional</option><option>Lucro Presumido</option><option>Lucro Real</option><option>MEI</option></select>
+          <select class="fs" id="flt-status" onchange="filterClients()"><option value="">Todos os status</option><option>Ativo</option><option>Em implantação</option><option>Em atenção</option><option>Em saída</option></select>
+          <select class="fs" id="flt-resp" onchange="filterClients()"><option value="">Todos os responsáveis</option><option>Ana Lima</option><option>Bruno Carvalho</option><option>Carla Santos</option></select>
+        </div>
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>Razão Social</th><th>CNPJ</th><th>Regime</th><th>Origem</th><th>Status</th><th>Responsável</th><th>Entrada</th><th>Ações</th></tr></thead>
+        <tbody id="cl-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     ONBOARDING
+════════════════════════════════ -->
+<section id="sec-onboarding" class="section">
+  <div class="ph"><div><h2>Onboarding</h2><p>Gestão de entrada de clientes com tarefas automáticas</p></div></div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-card"><div class="sl">Em andamento</div><div class="sv">11</div></div>
+    <div class="stat-card danger"><div class="sl">Com atraso</div><div class="sv">7</div></div>
+    <div class="stat-card success"><div class="sl">Concluídos (mês)</div><div class="sv">9</div></div>
+    <div class="stat-card warning"><div class="sl">Tarefas abertas</div><div class="sv">84</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Lista de Onboardings</div>
+      <div class="fbar">
+        <div class="si"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
+        <select class="fs"><option>Todos</option><option>Em andamento</option><option>Atrasado</option><option>Concluído</option></select>
+      </div>
+    </div>
+    <div class="tw"><table><thead><tr><th>Cliente</th><th>Regime</th><th>Origem</th><th>Início</th><th>Progresso</th><th>Status</th><th>Responsável</th><th>Ação</th></tr></thead>
+    <tbody id="onb-tbody"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     RELACIONAMENTO
+════════════════════════════════ -->
+<section id="sec-relacionamento" class="section">
+
+  <!-- DETAIL -->
+  <div id="rel-detail" style="display:none">
+    <button class="bk" onclick="showRelList()">← Voltar ao Relacionamento</button>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="rel-det-name"></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('mo-interaction')">+ Registrar Interação</button>
+      </div>
+      <div style="padding:0 18px">
+        <div class="tab-bar">
+          <div class="tab active" onclick="relTab(this,'rtab-tl')">📅 Interações</div>
+          <div class="tab" onclick="relTab(this,'rtab-obs')">📝 Observações</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="rtab-tl"><div class="tl" id="rel-tl"></div></div>
+        <div id="rtab-obs" style="display:none">
+          <div class="fg"><label class="fl">Perfil do cliente / Observações estratégicas</label>
+            <textarea class="fc" rows="5" placeholder="Sensibilidade a preço, preferências de comunicação, histórico relevante..."></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="toast('Observações salvas!','success')">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div id="rel-list">
+    <div class="ph">
+      <div><h2>Relacionamento</h2><p>Acompanhamento e histórico de contatos</p></div>
+      <button class="btn btn-primary" onclick="openModal('mo-interaction')">+ Registrar Interação</button>
+    </div>
+    <div class="g3">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="color:var(--red)">🔴 Contatos Atrasados</div><span class="badge br">3</span></div>
+        <div class="card-body" style="padding:10px 18px">
+          <div class="sr"><div class="srico">👤</div><div class="srinfo"><strong>Padaria Estrela</strong><span>Venceu há 5 dias · Ana Lima</span></div></div>
+          <div class="sr"><div class="srico">👤</div><div class="srinfo"><strong>Grupo Omega</strong><span>Venceu há 2 dias · Bruno C.</span></div></div>
+          <div class="sr"><div class="srico">👤</div><div class="srinfo"><strong>Auto Peças JB</strong><span>Venceu ontem · Carla S.</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="color:var(--yellow)">🟡 Hoje</div><span class="badge by">2</span></div>
+        <div class="card-body" style="padding:10px 18px">
+          <div class="sr"><div class="srico">👤</div><div class="srinfo"><strong>Tech Solutions ME</strong><span>Reunião · 14:00 · Ana Lima</span></div></div>
+          <div class="sr"><div class="srico">👤</div><div class="srinfo"><strong>Construtora ABC</strong><span>Ligação · 16:30 · Bruno C.</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚠️ Clientes em Risco</div><span class="badge br">9</span></div>
+        <div class="card-body" style="padding:10px 18px">
+          <div class="sr"><div class="srico">🔴</div><div class="srinfo"><strong>Padaria Estrela</strong><span>Sem contato há 45 dias</span></div></div>
+          <div class="sr"><div class="srico">🟡</div><div class="srinfo"><strong>Maria Costura</strong><span>3 tarefas atrasadas</span></div></div>
+          <div class="sr"><div class="srico">🔴</div><div class="srinfo"><strong>Dr. Paulo Consultório</strong><span>Sem contato há 38 dias</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Todos os Clientes</div>
+        <div class="fbar">
+          <div class="si"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
+          <select class="fs"><option>Todos os status</option><option>Verde</option><option>Amarelo</option><option>Vermelho</option></select>
+          <select class="fs"><option>Todos</option><option>Sem contato &gt;30d</option><option>Sem contato &gt;60d</option></select>
+          <select class="fs"><option>Ordenar por última interação</option><option>Por próximo contato</option><option>Por status</option></select>
+        </div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Cliente</th><th>Responsável</th><th>Última Interação</th><th>Próx. Contato</th><th>Status</th><th>Ação</th></tr></thead>
+      <tbody id="rel-tbody"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     OFFBOARDING
+════════════════════════════════ -->
+<section id="sec-offboarding" class="section">
+  <div class="ph">
+    <div><h2>Offboarding</h2><p>Gestão de saída de clientes com tarefas automáticas</p></div>
+    <button class="btn btn-primary" onclick="openModal('mo-new-off')">+ Iniciar Saída</button>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card"><div class="sl">Em andamento</div><div class="sv">5</div></div>
+    <div class="stat-card danger"><div class="sl">Com atraso</div><div class="sv">2</div></div>
+    <div class="stat-card success"><div class="sl">Concluídos (mês)</div><div class="sv">3</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Clientes em Saída</div></div>
+    <div class="tw"><table><thead><tr><th>Cliente</th><th>Regime</th><th>Tipo</th><th>Início</th><th>Prazo Final</th><th>Responsável</th><th>Status</th><th>Progresso</th><th>Ação</th></tr></thead>
+    <tbody id="off-tbody"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     PRECIFICAÇÃO
+════════════════════════════════ -->
+<section id="sec-precificacao" class="section">
+  <div id="prec-content"></div>
+</section>
+
+<!-- ════════════════════════════════
+     RELATÓRIOS
+════════════════════════════════ -->
+<section id="sec-relatorios" class="section">
+  <div class="ph"><div><h2>Relatórios Gerenciais</h2><p>Relatórios profissionais para seus clientes</p></div></div>
+  <div class="g12">
+    <!-- Filters -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚙️ Configurar Relatório</div></div>
+      <div class="card-body">
+        <div class="fg"><label class="fl">Cliente <span class="req">*</span></label>
+          <select class="fc" id="r-client"><option value="">Selecionar...</option><option>Tech Solutions ME</option><option>Padaria Estrela Ltda</option><option>Construtora ABC</option><option>Grupo Nexus</option></select>
+          <span class="err-msg">Selecione um cliente</span>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Data Início <span class="req">*</span></label><input class="fc" type="date" id="r-start" value="2025-03-01"></div>
+          <div class="fg"><label class="fl">Data Fim <span class="req">*</span></label><input class="fc" type="date" id="r-end" value="2025-03-31"></div>
+        </div>
+        <div class="fg"><label class="fl">Departamento</label>
+          <select class="fc" id="r-dept"><option value="">Todos</option><option>Fiscal</option><option>Dep. Pessoal</option><option>Contábil</option><option>Societário</option></select>
+        </div>
+        <div class="fg"><label class="fl">Responsável</label>
+          <select class="fc" id="r-resp"><option value="">Todos</option><option>Ana Lima</option><option>Bruno Carvalho</option><option>Carla Santos</option></select>
+        </div>
+        <div class="fg"><label class="fl">Tipo</label>
+          <select class="fc"><option>Completo</option><option>Resumido</option></select>
+        </div>
+        <div class="fst">Relatórios Rápidos</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="quickReport('tarefas')">📋 Tarefas por período</button>
+          <button class="btn btn-ghost btn-sm" onclick="quickReport('vencidas')">⏰ Obrigações vencidas</button>
+          <button class="btn btn-ghost btn-sm" onclick="quickReport('produtividade')">📈 Produtividade por colaborador</button>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" style="width:100%" id="r-gen-btn" onclick="generateReport()">📊 Gerar Relatório</button>
+        </div>
+      </div>
+    </div>
+    <!-- Preview -->
+    <div>
+      <div id="r-area">
+        <div class="empty card" style="padding:50px"><div class="ei">📄</div><p>Configure os filtros e clique em Gerar Relatório.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     CONFIGURAÇÕES
+════════════════════════════════ -->
+<section id="sec-configuracoes" class="section">
+  <div class="ph"><div><h2>Configurações</h2><p>Parâmetros centrais do sistema · Restrito a administradores</p></div></div>
+  <div style="display:grid;grid-template-columns:210px 1fr;gap:18px">
+    <div class="card" style="height:fit-content">
+      <div class="card-body" style="padding:10px">
+        <div class="cnav" id="cnav">
+          <div class="cnav-item active" onclick="cfgTab(this,'cfg-regimes')">📋 Regimes Tributários</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-modulos')">📦 Módulos</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-onb')">🚀 Templates Onboarding</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-off')">🔄 Templates Offboarding</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-pricing')">💰 Precificação</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-users')">👥 Usuários</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-setores')">🏢 Setores</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-geral')">⚙️ Parâm. Gerais</div>
+          <div class="cnav-item" onclick="cfgTab(this,'cfg-int')">🔌 Integrações</div>
+        </div>
+      </div>
+    </div>
+    <div id="cfg-content">
+
+      <div id="cfg-regimes" class="card">
+        <div class="card-header"><div class="card-title">Regimes Tributários</div><button class="btn btn-primary btn-sm" onclick="toast('Novo regime adicionado!','success')">+ Novo</button></div>
+        <div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+          <tr><td><strong>Simples Nacional</strong></td><td style="font-size:.78rem">Regime unificado de arrecadação</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando Simples Nacional...','info')">✏️</button></td></tr>
+          <tr><td><strong>Lucro Presumido</strong></td><td style="font-size:.78rem">Tributação sobre lucro estimado</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando Lucro Presumido...','info')">✏️</button></td></tr>
+          <tr><td><strong>Lucro Real</strong></td><td style="font-size:.78rem">Tributação sobre lucro efetivo</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando Lucro Real...','info')">✏️</button></td></tr>
+          <tr><td><strong>MEI</strong></td><td style="font-size:.78rem">Microempreendedor Individual</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando MEI...','info')">✏️</button></td></tr>
+          <tr><td><strong>Imune/Isenta</strong></td><td style="font-size:.78rem">Entidades sem fins lucrativos</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando Imune/Isenta...','info')">✏️</button></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div id="cfg-modulos" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Módulos do Escritório</div><button class="btn btn-primary btn-sm" onclick="toast('Novo módulo adicionado!','success')">+ Novo</button></div>
+        <div class="tw"><table><thead><tr><th>Módulo</th><th>Setor Responsável</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+          <tr><td><strong>Fiscal</strong></td><td>Fiscal</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo Fiscal...','info')">✏️</button></td></tr>
+          <tr><td><strong>Dep. Pessoal</strong></td><td>DP</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo Dep. Pessoal...','info')">✏️</button></td></tr>
+          <tr><td><strong>Contábil</strong></td><td>Contábil</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo Contábil...','info')">✏️</button></td></tr>
+          <tr><td><strong>Societário</strong></td><td>Societário</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo Societário...','info')">✏️</button></td></tr>
+          <tr><td><strong>BPO Financeiro</strong></td><td>Financeiro</td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo BPO Financeiro...','info')">✏️</button></td></tr>
+          <tr><td><strong>Consultoria</strong></td><td>Contábil</td><td><span class="badge by">Inativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando módulo Consultoria...','info')">✏️</button></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div id="cfg-onb" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Templates de Onboarding</div><button class="btn btn-primary btn-sm" onclick="openModal('mo-new-tpl')">+ Novo Template</button></div>
+        <div class="card-body" id="onb-tpl-list"></div>
+      </div>
+
+      <div id="cfg-off" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Templates de Offboarding</div><button class="btn btn-primary btn-sm" onclick="openModal('mo-new-tpl')">+ Novo Template</button></div>
+        <div class="card-body">
+          <div class="sr"><div class="srico">📋</div><div class="srinfo"><strong>Simples Nacional + Transferência</strong><span>8 tarefas</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando template...','info')">Editar</button></div>
+          <div class="sr"><div class="srico">📋</div><div class="srinfo"><strong>Simples Nacional + Encerramento</strong><span>11 tarefas</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando template...','info')">Editar</button></div>
+          <div class="sr"><div class="srico">📋</div><div class="srinfo"><strong>Lucro Presumido + Encerramento</strong><span>14 tarefas</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando template...','info')">Editar</button></div>
+        </div>
+      </div>
+
+      <div id="cfg-pricing" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Parâmetros de Precificação</div><button class="btn btn-primary btn-sm" onclick="savePricingParams()">Salvar</button></div>
+        <div class="card-body">
+          <div class="fst">Valores Base por Regime (R$/mês)</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">MEI</label><input class="fc" id="pp-mei" value="150"></div>
+            <div class="fg"><label class="fl">Simples Nacional</label><input class="fc" id="pp-simples" value="350"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Lucro Presumido</label><input class="fc" id="pp-presumido" value="650"></div>
+            <div class="fg"><label class="fl">Lucro Real</label><input class="fc" id="pp-real" value="1200"></div>
+          </div>
+          <div class="fst">Variáveis</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Custo por funcionário (R$)</label><input class="fc" id="pp-func" value="45"></div>
+            <div class="fg"><label class="fl">Custo por 10 NFs (R$)</label><input class="fc" id="pp-nf" value="30"></div>
+          </div>
+          <div class="fst">Controles de Risco</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Honorário mínimo (R$)</label><input class="fc" id="pp-min" value="200"></div>
+            <div class="fg"><label class="fl">Desconto máximo (%)</label><input class="fc" id="pp-desc" value="15"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cfg-users" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Usuários e Permissões</div><button class="btn btn-primary btn-sm" onclick="openModal('mo-new-user')">+ Novo Usuário</button></div>
+        <div class="tw"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Prec.</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+          <tr><td><strong>Ricardo Costa</strong></td><td>rc@escritorio.com</td><td><span class="badge bb">Admin</span></td><td><span class="badge bg">✓ Acesso</span></td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando usuário Ricardo Costa...','info')">✏️</button></td></tr>
+          <tr><td><strong>Ana Lima</strong></td><td>ana@escritorio.com</td><td><span class="badge bgr">Gestor</span></td><td><span class="badge bg">✓ Acesso</span></td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando usuário Ana Lima...','info')">✏️</button></td></tr>
+          <tr><td><strong>Bruno Carvalho</strong></td><td>bruno@escritorio.com</td><td><span class="badge bgr">Fiscal</span></td><td><span class="badge br">✗ Sem acesso</span></td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando usuário Bruno Carvalho...','info')">✏️</button></td></tr>
+          <tr><td><strong>Carla Santos</strong></td><td>carla@escritorio.com</td><td><span class="badge bgr">DP</span></td><td><span class="badge br">✗ Sem acesso</span></td><td><span class="badge bg">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="toast('Editando usuário Carla Santos...','info')">✏️</button></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div id="cfg-setores" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Setores e Responsáveis</div><button class="btn btn-primary btn-sm" onclick="toast('Novo setor criado!','success')">+ Novo Setor</button></div>
+        <div class="card-body">
+          <div class="sr"><div class="srico">⚖️</div><div class="srinfo"><strong>Fiscal</strong><span>Responsável: Bruno Carvalho · 4 colaboradores</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando setor Fiscal...','info')">Editar</button></div>
+          <div class="sr"><div class="srico">👷</div><div class="srinfo"><strong>Departamento Pessoal</strong><span>Responsável: Carla Santos · 3 colaboradores</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando setor Dep. Pessoal...','info')">Editar</button></div>
+          <div class="sr"><div class="srico">📒</div><div class="srinfo"><strong>Contábil</strong><span>Responsável: Ana Lima · 3 colaboradores</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando setor Contábil...','info')">Editar</button></div>
+          <div class="sr"><div class="srico">🏢</div><div class="srinfo"><strong>Societário</strong><span>Responsável: Ricardo Costa · 2 colaboradores</span></div><button class="btn btn-ghost btn-sm" onclick="toast('Editando setor Societário...','info')">Editar</button></div>
+        </div>
+      </div>
+
+      <div id="cfg-geral" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Parâmetros Gerais</div><button class="btn btn-primary btn-sm" onclick="toast('Configurações salvas!','success')">Salvar</button></div>
+        <div class="card-body">
+          <div class="fst">Prazos Padrão (dias)</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Prazo onboarding</label><input class="fc" value="30"></div>
+            <div class="fg"><label class="fl">Prazo offboarding</label><input class="fc" value="45"></div>
+          </div>
+          <div class="fst">Regras de Alerta (dias sem contato)</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">→ Amarelo</label><input class="fc" value="30"></div>
+            <div class="fg"><label class="fl">→ Vermelho</label><input class="fc" value="60"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cfg-int" class="card" style="display:none">
+        <div class="card-header"><div class="card-title">Integrações (Em breve)</div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="sr" style="opacity:.5"><div class="srico">🔗</div><div class="srinfo"><strong>Alterdata</strong><span>Em desenvolvimento</span></div><span class="badge bgr">Em breve</span></div>
+            <div class="sr" style="opacity:.5"><div class="srico">🔗</div><div class="srinfo"><strong>Omie</strong><span>Em desenvolvimento</span></div><span class="badge bgr">Em breve</span></div>
+            <div class="sr" style="opacity:.5"><div class="srico">🔗</div><div class="srinfo"><strong>Conta Azul</strong><span>Em desenvolvimento</span></div><span class="badge bgr">Em breve</span></div>
+            <div class="sr" style="opacity:.5"><div class="srico">📱</div><div class="srinfo"><strong>WhatsApp</strong><span>Em desenvolvimento</span></div><span class="badge bgr">Em breve</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ════════════════════════════════
+     MODALS
+════════════════════════════════ -->
+
+<!-- New Client -->
+<div class="mo" id="mo-new-client">
+  <div class="md">
+    <div class="md-h"><h3>Novo Cliente</h3><button class="md-x" onclick="closeModal('mo-new-client')">✕</button></div>
+    <div class="md-b">
+      <div class="fst">Identificação</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Razão Social <span class="req">*</span></label><input class="fc" id="nc-razao" placeholder="Razão social..."><span class="err-msg">Campo obrigatório</span></div>
+        <div class="fg"><label class="fl">Nome Fantasia</label><input class="fc" id="nc-fantasia" placeholder="Nome fantasia..."></div>
+      </div>
+      <div class="fg"><label class="fl">CNPJ <span class="req">*</span></label><input class="fc" id="nc-cnpj" placeholder="00.000.000/0001-00"><span class="err-msg">Campo obrigatório</span></div>
+      <div class="fst">Classificação</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Regime Tributário <span class="req">*</span></label>
+          <select class="fc" id="nc-regime" onchange="checkTemplate()"><option value="">Selecionar...</option><option value="simples">Simples Nacional</option><option value="presumido">Lucro Presumido</option><option value="real">Lucro Real</option><option value="mei">MEI</option><option value="isenta">Imune/Isenta</option></select>
+          <span class="err-msg">Campo obrigatório</span></div>
+        <div class="fg"><label class="fl">Origem <span class="req">*</span></label>
+          <select class="fc" id="nc-origem" onchange="checkTemplate()"><option value="">Selecionar...</option><option value="abertura">Abertura</option><option value="transferencia">Transferência</option></select>
+          <span class="err-msg">Campo obrigatório</span></div>
+      </div>
+      <div class="fst">Módulos Contratados</div>
+      <div id="nc-mods" class="chip-group"></div>
+      <div class="fst">Operacional</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Responsável</label>
+          <select class="fc" id="nc-resp"><option>Ana Lima</option><option>Bruno Carvalho</option><option>Carla Santos</option><option>Ricardo Costa</option></select></div>
+        <div class="fg"><label class="fl">Status</label>
+          <select class="fc" id="nc-status"><option value="implantacao">Em implantação</option><option value="ativo">Ativo</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Data de Entrada</label><input class="fc" type="date" id="nc-data"></div>
+      <div class="fg"><label class="fl">Observações</label><textarea class="fc" id="nc-obs" placeholder="Observações..."></textarea></div>
+      <div id="nc-tpl-info" style="display:none;margin-top:10px;padding:11px 14px;background:var(--greenl);border:1px solid var(--greenb);border-radius:var(--r)">
+        <strong style="font-size:.78rem;color:#065f46">✅ Template encontrado!</strong>
+        <p id="nc-tpl-txt" style="font-size:.74rem;color:#065f46;margin-top:2px"></p>
+      </div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-new-client')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewClient()">💾 Cadastrar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Interaction -->
+<div class="mo" id="mo-interaction">
+  <div class="md" style="max-width:500px">
+    <div class="md-h"><h3>Registrar Interação</h3><button class="md-x" onclick="closeModal('mo-interaction')">✕</button></div>
+    <div class="md-b">
+      <div class="fg"><label class="fl">Cliente <span class="req">*</span></label>
+        <select class="fc"><option>Tech Solutions ME</option><option>Padaria Estrela Ltda</option><option>Construtora ABC</option></select></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Tipo de Contato</label>
+          <select class="fc"><option>WhatsApp</option><option>E-mail</option><option>Ligação</option><option>Reunião</option><option>Presencial</option></select></div>
+        <div class="fg"><label class="fl">Data</label><input class="fc" type="date"></div>
+      </div>
+      <div class="fg"><label class="fl">Responsável</label>
+        <select class="fc"><option>Ana Lima</option><option>Bruno Carvalho</option><option>Carla Santos</option></select></div>
+      <div class="fg"><label class="fl">Resumo <span class="req">*</span></label><textarea class="fc" placeholder="Descreva brevemente a interação..."></textarea></div>
+      <div class="fg"><label class="fl">Próximo Passo</label><input class="fc" type="text" placeholder="O que deve ser feito a seguir..."></div>
+      <div class="fg"><label class="fl">Data do Próximo Contato</label><input class="fc" type="date"></div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-interaction')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveInteraction()">💾 Salvar Interação</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Offboarding -->
+<div class="mo" id="mo-new-off">
+  <div class="md" style="max-width:500px">
+    <div class="md-h"><h3>Iniciar Saída de Cliente</h3><button class="md-x" onclick="closeModal('mo-new-off')">✕</button></div>
+    <div class="md-b">
+      <div class="fg"><label class="fl">Cliente <span class="req">*</span></label>
+        <select class="fc"><option value="">Selecionar...</option><option>Padaria Estrela Ltda</option><option>Tech Solutions ME</option><option>Grupo Nexus</option></select></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Regime</label>
+          <select class="fc"><option>Simples Nacional</option><option>Lucro Presumido</option><option>Lucro Real</option></select></div>
+        <div class="fg"><label class="fl">Tipo de Saída <span class="req">*</span></label>
+          <select class="fc"><option>Transferência</option><option>Encerramento</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Motivo <span class="req">*</span></label>
+        <select class="fc"><option value="">Selecionar...</option><option>Preço</option><option>Atendimento</option><option>Erro operacional</option><option>Mudança de contador</option><option>Encerramento da empresa</option><option>Outro</option></select></div>
+      <div class="fg"><label class="fl">Data de Início</label><input class="fc" type="date"></div>
+      <div class="fg"><label class="fl">Observações</label><textarea class="fc" placeholder="Detalhes sobre a saída..."></textarea></div>
+      <div style="padding:10px 13px;background:var(--yell);border:1px solid var(--yellb);border-radius:var(--r);margin-top:8px">
+        <strong style="font-size:.78rem;color:#92400e">⚡ Tarefas geradas automaticamente</strong>
+        <p style="font-size:.72rem;color:#92400e;margin-top:2px">Com base no regime e tipo de saída selecionados.</p>
+      </div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-new-off')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveOffboarding()">🚀 Iniciar Offboarding</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Template -->
+<div class="mo" id="mo-new-tpl">
+  <div class="md">
+    <div class="md-h"><h3>Novo Template de Onboarding</h3><button class="md-x" onclick="closeModal('mo-new-tpl')">✕</button></div>
+    <div class="md-b">
+      <div class="fr">
+        <div class="fg"><label class="fl">Regime Tributário</label>
+          <select class="fc"><option>Simples Nacional</option><option>Lucro Presumido</option><option>Lucro Real</option><option>MEI</option></select></div>
+        <div class="fg"><label class="fl">Origem</label>
+          <select class="fc"><option>Abertura</option><option>Transferência</option></select></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px">
+        <strong style="font-size:.8rem;color:var(--navy)">Tarefas</strong>
+        <button class="btn btn-primary btn-sm" onclick="addTplTask()">+ Tarefa</button>
+      </div>
+      <div id="tpl-tasks"></div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-new-tpl')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTpl()">💾 Salvar Template</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Client Modal -->
+<div class="mo" id="mo-edit-client">
+  <div class="md">
+    <div class="md-h"><h3>Editar Cliente</h3><button class="md-x" onclick="closeModal('mo-edit-client')">✕</button></div>
+    <div class="md-b">
+      <div class="fst">Identificação</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Razão Social <span class="req">*</span></label><input class="fc" id="ec-razao" placeholder="Razão social..."><span class="err-msg">Campo obrigatório</span></div>
+        <div class="fg"><label class="fl">Nome Fantasia</label><input class="fc" id="ec-fantasia" placeholder="Nome fantasia..."></div>
+      </div>
+      <div class="fg"><label class="fl">CNPJ <span class="req">*</span></label><input class="fc" id="ec-cnpj" placeholder="00.000.000/0001-00"><span class="err-msg">Campo obrigatório</span></div>
+      <div class="fst">Classificação</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Regime Tributário <span class="req">*</span></label>
+          <select class="fc" id="ec-regime"><option value="">Selecionar...</option><option value="simples">Simples Nacional</option><option value="presumido">Lucro Presumido</option><option value="real">Lucro Real</option><option value="mei">MEI</option><option value="isenta">Imune/Isenta</option></select></div>
+        <div class="fg"><label class="fl">Origem</label>
+          <select class="fc" id="ec-origem"><option value="abertura">Abertura</option><option value="transferencia">Transferência</option></select></div>
+      </div>
+      <div class="fst">Operacional</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Responsável</label>
+          <select class="fc" id="ec-resp"><option>Ana Lima</option><option>Bruno Carvalho</option><option>Carla Santos</option><option>Ricardo Costa</option></select></div>
+        <div class="fg"><label class="fl">Status</label>
+          <select class="fc" id="ec-status"><option value="implantacao">Em implantação</option><option value="ativo">Ativo</option><option value="atencao">Em Atenção</option><option value="saida">Em Saída</option><option value="encerrado">Encerrado</option></select></div>
+      </div>
+      <input type="hidden" id="ec-id">
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-edit-client')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditClient()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- New User Modal -->
+<div class="mo" id="mo-new-user">
+  <div class="md" style="max-width:480px">
+    <div class="md-h"><h3>Novo Usuário</h3><button class="md-x" onclick="closeModal('mo-new-user')">✕</button></div>
+    <div class="md-b">
+      <div class="fr">
+        <div class="fg"><label class="fl">Nome Completo <span class="req">*</span></label><input class="fc" id="nu-nome" placeholder="Nome..."></div>
+        <div class="fg"><label class="fl">E-mail <span class="req">*</span></label><input class="fc" id="nu-email" type="email" placeholder="email@..."></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Perfil <span class="req">*</span></label>
+          <select class="fc" id="nu-perfil"><option value="colaborador">Colaborador</option><option value="fiscal">Analista Fiscal</option><option value="gestor">Gestor</option><option value="admin">Administrador</option></select></div>
+        <div class="fg"><label class="fl">Setor</label>
+          <select class="fc" id="nu-setor"><option>Fiscal</option><option>Dep. Pessoal</option><option>Contábil</option><option>Societário</option><option>Geral</option></select></div>
+      </div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-secondary" onclick="closeModal('mo-new-user')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewUser()">💾 Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTS & DATA ────────────────────────────────────────────────────────
+const REGIMES = {simples:'Simples Nacional',presumido:'Lucro Presumido',real:'Lucro Real',mei:'MEI',isenta:'Imune/Isenta'};
+const ORIGINS = {abertura:'Abertura',transferencia:'Transferência'};
+const STATUSES = {implantacao:{l:'Em Implantação',c:'by'},ativo:{l:'Ativo',c:'bg'},atencao:{l:'Em Atenção',c:'br'},saida:{l:'Em Saída',c:'bo'},encerrado:{l:'Encerrado',c:'bgr'}};
+const MODULES = ['Fiscal','Dep. Pessoal','Contábil','Societário','Financeiro','BPO Financeiro','Consultoria'];
+const DEPT_ICONS = {Fiscal:'⚖️','Dep. Pessoal':'👷',Contábil:'📒',Societário:'🏢',Financeiro:'💳',Geral:'📋'};
+
+// Access roles: which sections are accessible
+const ROLE_ACCESS = {
+  admin:['dashboard','clientes','onboarding','relacionamento','offboarding','precificacao','relatorios','configuracoes'],
+  gestor:['dashboard','clientes','onboarding','relacionamento','offboarding','precificacao','relatorios'],
+  fiscal:['dashboard','clientes','onboarding','relacionamento'],
+  colaborador:['dashboard','clientes','onboarding','relacionamento']
+};
+let currentRole = 'admin';
+
+const TASKS_TPL = {
+  simples_transferencia:[
+    {name:'Solicitar contrato social atualizado',dept:'Contábil',days:1,req:true},
+    {name:'Solicitar certificado digital',dept:'Fiscal',days:2,req:true},
+    {name:'Solicitar procuração',dept:'Societário',days:3,req:true},
+    {name:'Solicitar últimos DAS',dept:'Fiscal',days:3,req:true},
+    {name:'Conferir pendências no e-CAC',dept:'Fiscal',days:5,req:true},
+    {name:'Conferir situação no Simples Nacional',dept:'Fiscal',days:5,req:true},
+    {name:'Solicitar extrato do PGDAS',dept:'Fiscal',days:7,req:true},
+    {name:'Conferir folha de pagamento',dept:'Dep. Pessoal',days:7,req:false},
+    {name:'Conferir obrigações em aberto',dept:'Contábil',days:10,req:true},
+    {name:'Liberar cliente para operação mensal',dept:'Geral',days:30,req:true},
+  ],
+  simples_abertura:[
+    {name:'Elaborar contrato social',dept:'Societário',days:3,req:true},
+    {name:'Registrar na Junta Comercial',dept:'Societário',days:7,req:true},
+    {name:'Obter CNPJ',dept:'Fiscal',days:5,req:true},
+    {name:'Inscrever no Simples Nacional',dept:'Fiscal',days:10,req:true},
+    {name:'Configurar certificado digital',dept:'Fiscal',days:10,req:false},
+    {name:'Criar usuário no e-CAC',dept:'Fiscal',days:12,req:false},
+    {name:'Orientar sobre obrigações mensais',dept:'Geral',days:14,req:true},
+    {name:'Cadastrar no sistema interno',dept:'Geral',days:14,req:true},
+    {name:'Agendar reunião de boas-vindas',dept:'Geral',days:15,req:false},
+    {name:'Liberar para operação',dept:'Geral',days:30,req:true},
+  ],
+  presumido_transferencia:[
+    {name:'Solicitar contrato social e alterações',dept:'Contábil',days:1,req:true},
+    {name:'Solicitar livros contábeis',dept:'Contábil',days:2,req:true},
+    {name:'Solicitar declarações em aberto',dept:'Fiscal',days:3,req:true},
+    {name:'Solicitar procuração',dept:'Societário',days:3,req:true},
+    {name:'Verificar débitos tributários',dept:'Fiscal',days:5,req:true},
+    {name:'Analisar enquadramento tributário',dept:'Contábil',days:7,req:true},
+    {name:'Solicitar SPEDs anteriores',dept:'Fiscal',days:7,req:true},
+    {name:'Conferir situação na RFB',dept:'Fiscal',days:10,req:true},
+    {name:'Verificar FGTS e INSS',dept:'Dep. Pessoal',days:10,req:true},
+    {name:'Organizar documentação fiscal',dept:'Fiscal',days:14,req:true},
+    {name:'Liberar para operação',dept:'Geral',days:30,req:true},
+  ],
+  real_transferencia:[
+    {name:'Solicitar toda documentação',dept:'Contábil',days:1,req:true},
+    {name:'Analisar escrituração anterior',dept:'Contábil',days:5,req:true},
+    {name:'Verificar saldo de prejuízos',dept:'Contábil',days:7,req:true},
+    {name:'Solicitar ECF/ECD anteriores',dept:'Fiscal',days:7,req:true},
+    {name:'Analisar contratos',dept:'Societário',days:10,req:false},
+    {name:'Verificar passivos trabalhistas',dept:'Dep. Pessoal',days:10,req:true},
+    {name:'Conferir situação FGTS',dept:'Dep. Pessoal',days:12,req:true},
+    {name:'Verificar tributos federais',dept:'Fiscal',days:14,req:true},
+    {name:'Analisar estoque',dept:'Contábil',days:15,req:false},
+    {name:'Conferir ativo imobilizado',dept:'Contábil',days:18,req:false},
+    {name:'Liberar para operação',dept:'Geral',days:30,req:true},
+  ],
+  mei_abertura:[
+    {name:'Formalizar MEI no Portal',dept:'Fiscal',days:2,req:true},
+    {name:'Obter certificado MEI',dept:'Fiscal',days:3,req:true},
+    {name:'Orientar sobre DAS mensal',dept:'Fiscal',days:5,req:true},
+    {name:'Orientar sobre DASN anual',dept:'Fiscal',days:5,req:true},
+    {name:'Cadastrar no sistema',dept:'Geral',days:7,req:true},
+    {name:'Liberar para operação',dept:'Geral',days:14,req:true},
+  ],
+  presumido_abertura:[
+    {name:'Elaborar contrato social',dept:'Societário',days:3,req:true},
+    {name:'Registrar na Junta',dept:'Societário',days:7,req:true},
+    {name:'Obter CNPJ e inscrições',dept:'Fiscal',days:5,req:true},
+    {name:'Configurar Lucro Presumido',dept:'Fiscal',days:10,req:true},
+    {name:'Criar livros contábeis',dept:'Contábil',days:12,req:true},
+    {name:'Configurar certificado digital',dept:'Fiscal',days:10,req:false},
+    {name:'Orientar sobre obrigações',dept:'Geral',days:14,req:true},
+    {name:'Cadastrar no sistema',dept:'Geral',days:14,req:true},
+    {name:'Liberar para operação',dept:'Geral',days:30,req:true},
+  ],
+};
+
+const CLIENTS = [
+  {id:1,razao:'Tech Solutions ME',fantasia:'TechSol',cnpj:'12.345.678/0001-90',regime:'simples',origem:'transferencia',status:'ativo',resp:'Ana Lima',data:'15/01/2025',modules:['Fiscal','Dep. Pessoal','Contábil']},
+  {id:2,razao:'Padaria Estrela Ltda',fantasia:'Padaria Estrela',cnpj:'98.765.432/0001-10',regime:'simples',origem:'transferencia',status:'atencao',resp:'Bruno Carvalho',data:'03/11/2024',modules:['Fiscal','Dep. Pessoal']},
+  {id:3,razao:'Construtora ABC',fantasia:'ABC Construções',cnpj:'11.222.333/0001-44',regime:'presumido',origem:'abertura',status:'implantacao',resp:'Carla Santos',data:'02/03/2025',modules:['Fiscal','Contábil','Societário']},
+  {id:4,razao:'Grupo Nexus',fantasia:'Nexus',cnpj:'55.666.777/0001-88',regime:'real',origem:'transferencia',status:'saida',resp:'Ricardo Costa',data:'10/06/2023',modules:['Fiscal','Dep. Pessoal','Contábil','Societário']},
+  {id:5,razao:'Maria Costura MEI',fantasia:'Maria Costura',cnpj:'44.555.666/0001-77',regime:'mei',origem:'abertura',status:'atencao',resp:'Ana Lima',data:'20/02/2025',modules:['Fiscal']},
+  {id:6,razao:'Auto Peças JB',fantasia:'JB Peças',cnpj:'33.444.555/0001-66',regime:'simples',origem:'transferencia',status:'ativo',resp:'Bruno Carvalho',data:'08/08/2024',modules:['Fiscal','Dep. Pessoal']},
+  {id:7,razao:'Dr. Paulo Consultório',fantasia:'Dr. Paulo',cnpj:'22.333.444/0001-55',regime:'simples',origem:'abertura',status:'ativo',resp:'Carla Santos',data:'15/09/2024',modules:['Fiscal','Contábil']},
+  {id:8,razao:'Comercial Norte Ltda',fantasia:'Com. Norte',cnpj:'77.888.999/0001-11',regime:'presumido',origem:'transferencia',status:'ativo',resp:'Ana Lima',data:'01/04/2024',modules:['Fiscal','Dep. Pessoal','Contábil','Financeiro']},
+];
+
+const ONB_DATA = [
+  {client:'Construtora ABC',regime:'Lucro Presumido',origem:'Abertura',inicio:'02/03/2025',progress:30,status:'atrasado',resp:'Carla Santos'},
+  {client:'Maria Costura MEI',regime:'MEI',origem:'Abertura',inicio:'20/02/2025',progress:70,status:'andamento',resp:'Ana Lima'},
+  {client:'Farmácia Central',regime:'Simples Nacional',origem:'Transferência',inicio:'10/03/2025',progress:50,status:'andamento',resp:'Bruno Carvalho'},
+  {client:'Transporte Veloz',regime:'Lucro Real',origem:'Transferência',inicio:'01/03/2025',progress:20,status:'atrasado',resp:'Ricardo Costa'},
+  {client:'Escola Kids ABC',regime:'Imune/Isenta',origem:'Abertura',inicio:'14/03/2025',progress:85,status:'andamento',resp:'Ana Lima'},
+];
+
+const OFF_DATA = [
+  {client:'Grupo Nexus',regime:'Lucro Real',tipo:'Transferência',inicio:'01/03/2025',prazo:'15/04/2025',resp:'Ricardo Costa',status:'atrasado',progress:40},
+  {client:'Restaurante Dom',regime:'Simples Nacional',tipo:'Encerramento',inicio:'10/03/2025',prazo:'30/04/2025',resp:'Ana Lima',status:'andamento',progress:60},
+  {client:'Confecções Silva',regime:'Simples Nacional',tipo:'Transferência',inicio:'15/03/2025',prazo:'29/04/2025',resp:'Bruno Carvalho',status:'andamento',progress:75},
+];
+
+const REL_DATA = [
+  {client:'Tech Solutions ME',resp:'Ana Lima',ultima:'28/04/2025',proxima:'05/05/2025',status:'g'},
+  {client:'Padaria Estrela Ltda',resp:'Bruno Carvalho',ultima:'14/03/2025',proxima:'15/04/2025',status:'r'},
+  {client:'Construtora ABC',resp:'Carla Santos',ultima:'10/04/2025',proxima:'02/05/2025',status:'y'},
+  {client:'Auto Peças JB',resp:'Bruno Carvalho',ultima:'05/04/2025',proxima:'30/04/2025',status:'r'},
+  {client:'Comercial Norte',resp:'Ana Lima',ultima:'25/04/2025',proxima:'10/05/2025',status:'g'},
+  {client:'Dr. Paulo Consultório',resp:'Carla Santos',ultima:'21/03/2025',proxima:'21/04/2025',status:'r'},
+  {client:'Maria Costura MEI',resp:'Ana Lima',ultima:'20/04/2025',proxima:'28/04/2025',status:'y'},
+];
+
+let PRICING_P = {simples:350,presumido:650,real:1200,mei:150,isenta:300,perFunc:45,perNF:30};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+let chartsInitialized = false;
+window.addEventListener('load',()=>{
+  buildChips('nc-mods', MODULES);
+  renderClients(CLIENTS);
+  renderOnb(ONB_DATA);
+  renderOff(OFF_DATA);
+  renderRel(REL_DATA);
+  renderONBTemplates();
+  document.getElementById('nc-data').valueAsDate = new Date();
+});
+
+function initChartsIfNeeded() {
+  if (chartsInitialized) return;
+  const c1 = document.getElementById('ch-status');
+  const c2 = document.getElementById('ch-tasks');
+  if (!c1 || !c2 || c1.offsetParent === null) return;
+  chartsInitialized = true;
+  initCharts();
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const icons = {success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="tico">${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.2s';setTimeout(()=>t.remove(),200)},3000);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+const SEC_NAMES = {dashboard:'Dashboard',clientes:'Clientes',onboarding:'Onboarding',relacionamento:'Relacionamento',offboarding:'Offboarding',precificacao:'Precificação',relatorios:'Relatórios Gerenciais',configuracoes:'Configurações'};
+function go(sec) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector(`[data-sec="${sec}"]`)?.classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tb-title').textContent = SEC_NAMES[sec]||sec;
+  const el = document.getElementById('sec-'+sec);
+  el.classList.add('active');
+  // Remove any previous access-denied overlays
+  el.querySelectorAll('.access-overlay').forEach(o=>o.remove());
+  // Access check — use overlay instead of replacing innerHTML
+  if(!ROLE_ACCESS[currentRole]?.includes(sec)) {
+    const overlay = document.createElement('div');
+    overlay.className = 'access-overlay';
+    overlay.style.cssText = 'position:absolute;inset:0;background:var(--g50);z-index:50;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `<div class="card" style="max-width:400px"><div class="access-denied">
+      <div class="icon">🔒</div>
+      <h3>Acesso Restrito</h3>
+      <p>Você não tem permissão para acessar esta área. Solicite ao administrador.</p>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="go('dashboard')">← Voltar ao Dashboard</button>
+    </div></div>`;
+    el.style.position = 'relative';
+    el.appendChild(overlay);
+    toast('Acesso negado. Permissão insuficiente.','error');
+    return;
+  }
+  if(sec==='precificacao') renderPrecificacao();
+}
+
+// ─── ROLE SWITCHER ────────────────────────────────────────────────────────────
+function switchRole(role) {
+  currentRole = role;
+  const labels = {admin:'Administrador',gestor:'Gestor',fiscal:'Analista Fiscal',colaborador:'Colaborador'};
+  const badges = {admin:'Admin',gestor:'Gestor',fiscal:'Fiscal',colaborador:'Colab.'};
+  const initials = {admin:'RC',gestor:'AL',fiscal:'BC',colaborador:'CS'};
+  document.getElementById('user-name').textContent = {admin:'Ricardo Costa',gestor:'Ana Lima',fiscal:'Bruno Carvalho',colaborador:'Carla Santos'}[role];
+  document.getElementById('user-role').innerHTML = labels[role]+` <span class="role-badge">${badges[role]}</span>`;
+  document.getElementById('user-av').textContent = initials[role];
+  toast(`Perfil alterado para: ${labels[role]}`,'info');
+  // Clean all access overlays from all sections
+  document.querySelectorAll('.access-overlay').forEach(o=>o.remove());
+  // Re-navigate to current section
+  const active = document.querySelector('.section.active');
+  if(active) {
+    const sec = active.id.replace('sec-','');
+    go(ROLE_ACCESS[role]?.includes(sec) ? sec : 'dashboard');
+  }
+}
+
+// ─── MODALS ───────────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');document.body.style.overflow=''}}));
+
+// ─── CHIPS ────────────────────────────────────────────────────────────────────
+function buildChips(containerId, items) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = items.map(m=>`<label class="chip" onclick="toggleChip(this)"><input type="checkbox"> ${m}</label>`).join('');
+}
+function toggleChip(el){el.classList.toggle('on');el.querySelector('input').checked=el.classList.contains('on');}
+
+// ─── CLIENT TABLE ─────────────────────────────────────────────────────────────
+function renderClients(data) {
+  const tbody = document.getElementById('cl-tbody');
+  tbody.innerHTML = data.map(c=>{
+    const s=STATUSES[c.status]||{l:c.status,c:'bgr'};
+    return `<tr>
+      <td><strong>${c.razao}</strong><div style="font-size:.68rem;color:var(--g400)">${c.fantasia}</div></td>
+      <td style="font-size:.75rem">${c.cnpj}</td>
+      <td><span class="badge bb">${REGIMES[c.regime]||c.regime}</span></td>
+      <td>${ORIGINS[c.origem]||c.origem}</td>
+      <td><span class="badge ${s.c}">${s.l}</span></td>
+      <td>${c.resp}</td>
+      <td>${c.data}</td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-xs" onclick="viewClient(${c.id})">👁️ Ver</button>
+        <button class="btn btn-ghost btn-xs" onclick="editClient(${c.id})">✏️ Editar</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('client-count').textContent = data.length;
+}
+function filterClients(){
+  const q=document.getElementById('search-cl').value.toLowerCase();
+  const r=document.getElementById('flt-regime').value;
+  const s=document.getElementById('flt-status').value;
+  const resp=document.getElementById('flt-resp').value;
+  renderClients(CLIENTS.filter(c=>{
+    if(q && !c.razao.toLowerCase().includes(q) && !c.cnpj.includes(q)) return false;
+    if(r && REGIMES[c.regime]!==r) return false;
+    if(s){const l=STATUSES[c.status]?.l;if(l!==s) return false;}
+    if(resp && c.resp!==resp) return false;
+    return true;
+  }));
+}
+
+// ─── CLIENT PROFILE ───────────────────────────────────────────────────────────
+function viewClient(id){
+  const c=CLIENTS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('pf-name').textContent=c.razao;
+  document.getElementById('pf-cnpj').textContent=c.cnpj;
+  document.getElementById('pf-regime').textContent=REGIMES[c.regime];
+  document.getElementById('pf-origem').textContent=ORIGINS[c.origem];
+  document.getElementById('pf-resp').textContent=c.resp;
+  const s=STATUSES[c.status];
+  const st=document.getElementById('pf-status');
+  st.textContent=s.l; st.className='badge '+s.c;
+  const modEl=document.getElementById('pf-mods');
+  modEl.innerHTML=c.modules.map(m=>`<span class="badge" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)">${m}</span>`).join('');
+  // Generate tasks from template
+  const key=c.regime+'_'+c.origem;
+  const tasks=TASKS_TPL[key]||TASKS_TPL.simples_transferencia;
+  buildDeptTabs(c, tasks);
+  document.getElementById('view-list').style.display='none';
+  document.getElementById('view-profile').style.display='block';
+}
+
+function buildDeptTabs(client, tasks){
+  // Get departments present in tasks
+  const depts = [...new Set(tasks.map(t=>t.dept))];
+  // Always add: Relacionamento, Documentos (disabled), Ocorrências
+  const extraTabs = ['Relacionamento','Documentos','Ocorrências','Offboarding'];
+  const tabBar = document.getElementById('dept-tabs');
+  const panel = document.getElementById('dept-panel');
+  
+  const allTabs = depts.concat(extraTabs);
+  // Count pending tasks per dept
+  const doneIds = new Set();
+  const counts = {};
+  depts.forEach(d=>{
+    const c = tasks.filter(t=>t.dept===d && !doneIds.has(t.name)).length;
+    counts[d] = c;
+  });
+  
+  tabBar.innerHTML = allTabs.map((d,i)=>{
+    const cnt = counts[d];
+    const isDisabled = d==='Documentos';
+    const isExtra = extraTabs.includes(d);
+    const icon = DEPT_ICONS[d]||'📋';
+    const countBadge = cnt>0 ? `<span class="tc">${cnt}</span>` : (depts.includes(d)?`<span class="tc ok">✓</span>`:'');
+    return `<div class="tab ${i===0?'active':''} ${isDisabled?'disabled':''}" 
+      onclick="${isDisabled?`toast('Funcionalidade em breve!','info')`:isExtra?`deptTabExtra(this,'${d}',${JSON.stringify(client).replace(/'/g,'\\')})`:`deptTab(this,'${d}')`}"
+      style="${isDisabled?'opacity:.45;cursor:not-allowed':''}"
+    >${icon} ${d} ${countBadge}</div>`;
+  }).join('');
+  
+  // Build first panel (first dept)
+  renderDeptPanel(panel, depts[0], tasks, client);
+  tabBar._tasks = tasks; tabBar._client = client;
+}
+
+function deptTab(el, dept){
+  const tabBar = document.getElementById('dept-tabs');
+  document.querySelectorAll('#dept-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderDeptPanel(document.getElementById('dept-panel'), dept, tabBar._tasks, tabBar._client);
+}
+
+function deptTabExtra(el, name, client){
+  document.querySelectorAll('#dept-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const panel = document.getElementById('dept-panel');
+  if(name==='Relacionamento'){
+    panel.innerHTML=`<div class="tl" id="inner-tl"></div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openModal('mo-interaction')">+ Registrar Interação</button>`;
+    buildSampleTimeline(document.getElementById('inner-tl'));
+  } else if(name==='Ocorrências'){
+    panel.innerHTML=`<div class="empty"><div class="ei">📝</div><p>Nenhuma ocorrência registrada.</p></div><button class="btn btn-secondary btn-sm">+ Nova Ocorrência</button>`;
+  } else if(name==='Offboarding'){
+    panel.innerHTML=`<div class="empty"><div class="ei">🔄</div><p>Este cliente não está em processo de offboarding.</p></div><button class="btn btn-primary btn-sm" onclick="openModal('mo-new-off')">Iniciar Saída</button>`;
+  }
+}
+
+function renderDeptPanel(panel, dept, tasks, client){
+  const deptTasks = tasks.filter(t=>t.dept===dept);
+  if(!deptTasks.length){panel.innerHTML=`<div class="empty"><div class="ei">✅</div><p>Nenhuma tarefa para este departamento.</p></div>`;return;}
+  
+  const done = Math.floor(deptTasks.length * 0.4);
+  const total = deptTasks.length;
+  const pct = Math.round(done/total*100);
+  const pCls = pct>=70?'g':pct>=40?'y':'r';
+  
+  panel.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:.72rem;color:var(--g500);margin-bottom:5px">${done} de ${total} tarefas concluídas</div>
+        <div class="pb" style="width:220px"><div class="pf ${pCls}" style="width:${pct}%"></div></div>
+      </div>
+      <div style="font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;color:${pct>=70?'var(--green)':pct>=40?'var(--yellow)':'var(--red)'}">${pct}%</div>
+    </div>
+    <div id="task-list-${dept.replace(/\s/g,'-')}"></div>`;
+  
+  const container = panel.querySelector(`#task-list-${dept.replace(/\s/g,'-')}`);
+  deptTasks.forEach((task,i)=>{
+    const isDone = i < done;
+    const isLate = !isDone && i < done+2;
+    const div = document.createElement('div');
+    div.className='ti';
+    div.innerHTML=`
+      <div class="tck ${isDone?'done':isLate?'vencido':''}" onclick="toggleTask(this)">
+        ${isDone?'✓':isLate?'!':''}
+      </div>
+      <div class="tinfo">
+        <div class="tname ${isDone?'done':''}">${task.name}</div>
+        <div class="tmeta">
+          <span>${DEPT_ICONS[task.dept]||''} ${task.dept}</span>
+          <span>Prazo: ${task.days}d</span>
+          ${task.req?'<span style="color:var(--accent);font-size:.65rem">● Obrigatória</span>':''}
+          ${isDone?`<span class="ok">✓ Concluído</span>`:isLate?`<span class="ov">⚠️ Atrasado</span>`:''}
+        </div>
+      </div>
+      <div style="flex-shrink:0">
+        ${!isDone?`<select class="fs" style="font-size:.7rem;padding:3px 7px" onchange="taskStatusChange(this)">
+          <option>Pendente</option><option>Em andamento</option><option>Concluído</option>
+        </select>`:`<span class="badge bg" style="font-size:.65rem">✓ Feito</span>`}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function taskStatusChange(sel){
+  if(sel.value==='Concluído'){
+    const ti = sel.closest('.ti');
+    const ck = ti.querySelector('.tck');
+    const nm = ti.querySelector('.tname');
+    ck.classList.add('done'); ck.textContent='✓';
+    nm.classList.add('done');
+    sel.replaceWith(Object.assign(document.createElement('span'),{className:'badge bg',style:'font-size:.65rem',textContent:'✓ Feito'}));
+    toast('Tarefa marcada como concluída!','success');
+  } else if(sel.value==='Em andamento'){
+    toast('Status atualizado.','info');
+  }
+}
+function toggleTask(el){
+  el.classList.toggle('done');
+  el.classList.remove('vencido');
+  const nm=el.nextElementSibling.querySelector('.tname');
+  nm.classList.toggle('done');
+  el.textContent=el.classList.contains('done')?'✓':'';
+  toast(el.classList.contains('done')?'Tarefa concluída!':'Tarefa reaberta.', el.classList.contains('done')?'success':'warning');
+}
+
+function showList(){
+  document.getElementById('view-list').style.display='block';
+  document.getElementById('view-profile').style.display='none';
+}
+
+// ─── ONBOARDING ───────────────────────────────────────────────────────────────
+function renderOnb(data){
+  document.getElementById('onb-tbody').innerHTML=data.map(o=>{
+    const sc=o.status==='atrasado'?'br':o.status==='concluido'?'bg':'bb';
+    const sl=o.status==='atrasado'?'Atrasado':o.status==='concluido'?'Concluído':'Em Andamento';
+    const pc=o.progress<40?'r':o.progress<70?'y':'g';
+    return `<tr>
+      <td><strong>${o.client}</strong></td>
+      <td><span class="badge bb" style="font-size:.65rem">${o.regime}</span></td>
+      <td>${o.origem}</td>
+      <td>${o.inicio}</td>
+      <td><div style="display:flex;align-items:center;gap:7px">
+        <div class="pb" style="width:75px"><div class="pf ${pc}" style="width:${o.progress}%"></div></div>
+        <span style="font-size:.72rem;color:var(--g500)">${o.progress}%</span>
+      </div></td>
+      <td><span class="badge ${sc}">${sl}</span></td>
+      <td>${o.resp}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="viewOnbTasks('${o.client}',this)">Ver Tarefas</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── OFFBOARDING ──────────────────────────────────────────────────────────────
+function renderOff(data){
+  document.getElementById('off-tbody').innerHTML=data.map(o=>{
+    const sc=o.status==='atrasado'?'br':'bb';
+    const sl=o.status==='atrasado'?'Atrasado':'Em Andamento';
+    const pc=o.progress<40?'r':o.progress<70?'y':'g';
+    return `<tr>
+      <td><strong>${o.client}</strong></td>
+      <td><span class="badge bb" style="font-size:.65rem">${o.regime}</span></td>
+      <td>${o.tipo}</td>
+      <td>${o.inicio}</td>
+      <td>${o.prazo}</td>
+      <td>${o.resp}</td>
+      <td><span class="badge ${sc}">${sl}</span></td>
+      <td><div style="display:flex;align-items:center;gap:7px">
+        <div class="pb" style="width:75px"><div class="pf ${pc}" style="width:${o.progress}%"></div></div>
+        <span style="font-size:.72rem">${o.progress}%</span>
+      </div></td>
+      <td><button class="btn btn-ghost btn-xs" onclick="viewOffTasks('${o.client}',this)">Ver</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── RELACIONAMENTO ───────────────────────────────────────────────────────────
+function renderRel(data){
+  document.getElementById('rel-tbody').innerHTML=data.map(r=>{
+    const lbl=r.status==='g'?'🟢 Saudável':r.status==='y'?'🟡 Atenção':'🔴 Risco';
+    const cls='thm '+r.status;
+    return `<tr>
+      <td><strong>${r.client}</strong></td>
+      <td>${r.resp}</td>
+      <td>${r.ultima}</td>
+      <td>${r.proxima}</td>
+      <td><div class="${cls}">${lbl}</div></td>
+      <td><button class="btn btn-ghost btn-xs" onclick="viewRelClient('${r.client}')">Ver histórico</button></td>
+    </tr>`;
+  }).join('');
+}
+function viewRelClient(name){
+  document.getElementById('rel-det-name').textContent=name;
+  buildSampleTimeline(document.getElementById('rel-tl'));
+  document.getElementById('rel-list').style.display='none';
+  document.getElementById('rel-detail').style.display='block';
+}
+function showRelList(){
+  document.getElementById('rel-list').style.display='block';
+  document.getElementById('rel-detail').style.display='none';
+}
+function relTab(el,id){
+  document.querySelectorAll('#rel-detail .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rtab-tl').style.display='none';
+  document.getElementById('rtab-obs').style.display='none';
+  document.getElementById(id).style.display='block';
+}
+function buildSampleTimeline(container){
+  const items=[
+    {date:'28/04/2025',type:'Reunião',person:'Ana Lima',cls:'',text:'Reunião mensal de alinhamento. Cliente satisfeito. Solicitou análise de regime tributário.',next:'Enviar análise tributária até 05/05'},
+    {date:'10/04/2025',type:'WhatsApp',person:'Ana Lima',cls:'green',text:'Enviamos documentos solicitados. Cliente confirmou recebimento.',next:'Agendar próxima reunião'},
+    {date:'01/04/2025',type:'E-mail',person:'Bruno Carvalho',cls:'',text:'Enviamos relatório gerencial referente a Março/2025.',next:'Aguardar feedback do cliente'},
+    {date:'15/03/2025',type:'Ligação',person:'Carla Santos',cls:'red',text:'Cliente ligou com dúvida sobre guia de recolhimento. Questão resolvida.',next:'Monitorar situação'},
+  ];
+  container.innerHTML=items.map(i=>`
+    <div class="tli">
+      <div class="tld ${i.cls}"></div>
+      <div class="tldate">${i.date} · ${i.person}</div>
+      <div class="tlbox">
+        <div class="tltype">${i.type}</div>
+        <p>${i.text}</p>
+        <div class="tlnext">→ ${i.next}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── CHECK TEMPLATE ───────────────────────────────────────────────────────────
+function checkTemplate(){
+  const r=document.getElementById('nc-regime').value;
+  const o=document.getElementById('nc-origem').value;
+  const info=document.getElementById('nc-tpl-info');
+  const txt=document.getElementById('nc-tpl-txt');
+  if(r&&o){
+    const key=r+'_'+o;
+    const tasks=TASKS_TPL[key];
+    if(tasks){
+      info.style.display='block';
+      txt.textContent=`Template "${REGIMES[r]} + ${ORIGINS[o]}" encontrado. ${tasks.length} tarefas geradas automaticamente.`;
+    } else { info.style.display='none'; }
+  } else { info.style.display='none'; }
+}
+
+// ─── SAVE NEW CLIENT ──────────────────────────────────────────────────────────
+function saveNewClient(){
+  let valid=true;
+  const req=['nc-razao','nc-cnpj','nc-regime','nc-origem'];
+  req.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el.value){el.classList.add('err');valid=false;} else el.classList.remove('err');
+  });
+  if(!valid){toast('Preencha os campos obrigatórios.','error');return;}
+  const nc={
+    id:CLIENTS.length+1,
+    razao:document.getElementById('nc-razao').value,
+    fantasia:document.getElementById('nc-fantasia').value||document.getElementById('nc-razao').value,
+    cnpj:document.getElementById('nc-cnpj').value,
+    regime:document.getElementById('nc-regime').value,
+    origem:document.getElementById('nc-origem').value,
+    status:document.getElementById('nc-status').value,
+    resp:document.getElementById('nc-resp').value,
+    data:new Date().toLocaleDateString('pt-BR'),
+    modules:Array.from(document.querySelectorAll('#nc-mods .chip.on')).map(c=>c.textContent.trim())
+  };
+  CLIENTS.unshift(nc);
+  renderClients(CLIENTS);
+  closeModal('mo-new-client');
+  req.forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nc-tpl-info').style.display='none';
+  toast(`Cliente "${nc.razao}" cadastrado com sucesso! Tarefas geradas automaticamente.`,'success');
+  go('clientes');
+}
+
+// (saveInteraction and saveOffboarding defined below in full implementations)
+
+// ─── PRICING ─────────────────────────────────────────────────────────────────
+function renderPrecificacao(){
+  const sec = document.getElementById('sec-precificacao');
+  if(!ROLE_ACCESS[currentRole]?.includes('precificacao')){
+    sec.innerHTML=`<div class="card"><div class="access-denied">
+      <div class="icon">🔒</div>
+      <h3>Acesso Restrito</h3>
+      <p>Você não tem permissão para acessar a Precificação. Solicite ao administrador.</p>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="go('dashboard')">← Voltar</button>
+    </div></div>`;
+    return;
+  }
+  sec.innerHTML=`<div id="prec-content">
+    <div class="ph"><div><h2>Precificação</h2><p>Calcule honorários com base nos parâmetros configurados</p></div></div>
+    <div class="g12">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📝 Dados do Cliente</div></div>
+        <div class="card-body">
+          <div class="fst">Identificação</div>
+          <div class="fg"><label class="fl">Nome da Empresa</label><input class="fc" id="p-nome" placeholder="Razão social..." oninput="calcPreco()"></div>
+          <div class="fg"><label class="fl">CNPJ</label><input class="fc" id="p-cnpj" placeholder="00.000.000/0001-00"></div>
+          <div class="fst">Classificação</div>
+          <div class="fg"><label class="fl">Regime Tributário</label>
+            <select class="fc" id="p-regime" onchange="calcPreco()">
+              <option value="">Selecionar...</option>
+              <option value="simples">Simples Nacional</option>
+              <option value="presumido">Lucro Presumido</option>
+              <option value="real">Lucro Real</option>
+              <option value="mei">MEI</option>
+            </select></div>
+          <div class="fst">Operacional</div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Faturamento mensal (R$)</label><input class="fc" type="number" id="p-fat" placeholder="0" oninput="calcPreco()"></div>
+            <div class="fg"><label class="fl">NFs por mês</label><input class="fc" type="number" id="p-nfs" placeholder="0" oninput="calcPreco()"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label class="fl">Funcionários</label><input class="fc" type="number" id="p-func" placeholder="0" oninput="calcPreco()"></div>
+            <div class="fg"><label class="fl">Sócios</label><input class="fc" type="number" id="p-socios" placeholder="0" oninput="calcPreco()"></div>
+          </div>
+          <div class="fg"><label class="fl">Possui filiais?</label>
+            <select class="fc" id="p-filiais" onchange="calcPreco()"><option value="0">Não</option><option value="1">Sim — 1</option><option value="2">Sim — 2+</option></select></div>
+          <div class="fst">Serviços Contratados</div>
+          <div id="p-servicos" class="chip-group"></div>
+          <div class="fst">Complexidade</div>
+          <div class="fg"><select class="fc" id="p-complex" onchange="calcPreco()">
+            <option value="1">Baixa</option><option value="1.3">Média</option><option value="1.7">Alta</option>
+          </select></div>
+        </div>
+      </div>
+      <div>
+        <div class="pres" id="p-result-box">
+          <div class="lbl" style="margin-bottom:6px">HONORÁRIO SUGERIDO</div>
+          <div class="val" id="p-val">R$ —</div>
+          <div class="lbl">por mês</div>
+          <div class="factors" id="p-factors"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-header"><div class="card-title">Detalhamento</div></div>
+          <div class="card-body" id="p-detail"><div class="empty"><div class="ei">💡</div><p>Preencha os dados para ver o detalhamento.</p></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-primary" style="flex:1" onclick="gerarProposta()">📄 Gerar Proposta</button>
+          <button class="btn btn-secondary" onclick="resetPreco()">🔄 Limpar</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  buildChips('p-servicos',['Fiscal','Dep. Pessoal','Contábil','Societário','Financeiro','BPO Financeiro','Consultoria']);
+  document.querySelectorAll('#p-servicos .chip').forEach(c=>c.addEventListener('click',()=>setTimeout(calcPreco,10)));
+}
+
+function calcPreco(){
+  const regime=document.getElementById('p-regime')?.value;
+  if(!regime) return;
+  const fat=parseFloat(document.getElementById('p-fat').value)||0;
+  const nfs=parseInt(document.getElementById('p-nfs').value)||0;
+  const func=parseInt(document.getElementById('p-func').value)||0;
+  const filiais=parseInt(document.getElementById('p-filiais').value)||0;
+  const complex=parseFloat(document.getElementById('p-complex').value)||1;
+  const services=Array.from(document.querySelectorAll('#p-servicos .chip.on')).map(c=>c.textContent.trim());
+  const svcPrices={Fiscal:80,'Dep. Pessoal':120,Contábil:100,Societário:150,Financeiro:130,'BPO Financeiro':200,Consultoria:250};
+  
+  const base=PRICING_P[regime]||350;
+  const funcCost=func*PRICING_P.perFunc;
+  const nfCost=Math.floor(nfs/10)*PRICING_P.perNF;
+  const fatMult=fat>500000?1.3:fat>100000?1.15:fat>50000?1.05:1;
+  const filialCost=filiais*200;
+  const svcSum=services.reduce((a,s)=>a+(svcPrices[s]||0),0);
+  const raw=Math.round((base+funcCost+nfCost+svcSum+filialCost)*complex*fatMult);
+  const min=PRICING_P.perFunc?200:200;
+  const final=Math.max(raw,min);
+  const warn=raw<min;
+  const fmt=v=>'R$ '+v.toLocaleString('pt-BR');
+  
+  document.getElementById('p-val').textContent=fmt(final);
+  document.getElementById('p-factors').innerHTML=[
+    `<div class="fac">Base: ${fmt(base)}</div>`,
+    func>0?`<div class="fac">Func: ${fmt(funcCost)}</div>`:'',
+    nfs>0?`<div class="fac">NFs: ${fmt(nfCost)}</div>`:'',
+    svcSum>0?`<div class="fac">Serviços: ${fmt(svcSum)}</div>`:'',
+    filiais>0?`<div class="fac">Filiais: ${fmt(filialCost)}</div>`:'',
+    `<div class="fac">×${complex} complexidade</div>`,
+  ].join('');
+  
+  const detail=document.getElementById('p-detail');
+  detail.innerHTML=`
+    <div class="sbi"><div class="sbn">Honorário final</div><div style="flex:1"></div><strong style="color:var(--navy);font-size:1rem">${fmt(final)}/mês</strong></div>
+    <div class="sbi"><div class="sbn">Regime</div><div style="flex:1"></div><span class="badge bb">${REGIMES[regime]}</span></div>
+    <div class="sbi"><div class="sbn">Serviços</div><div style="flex:1"></div><span style="font-size:.75rem">${services.length?services.join(', '):'—'}</span></div>
+    <div class="sbi"><div class="sbn">Complexidade</div><div style="flex:1"></div><span class="badge ${complex>=1.7?'br':complex>=1.3?'by':'bg'}">${complex>=1.7?'Alta':complex>=1.3?'Média':'Baixa'}</span></div>
+    ${warn?`<div style="margin-top:8px;padding:8px 11px;background:var(--yell);border:1px solid var(--yellb);border-radius:var(--r);font-size:.74rem;color:#92400e">⚠️ Valor mínimo aplicado: ${fmt(min)}</div>`:''}`;
+}
+
+function resetPreco(){
+  ['p-regime','p-fat','p-nfs','p-func','p-socios','p-nome','p-cnpj'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('#p-servicos .chip').forEach(c=>c.classList.remove('on'));
+  const v=document.getElementById('p-val');if(v)v.textContent='R$ —';
+  const f=document.getElementById('p-factors');if(f)f.innerHTML='';
+  const d=document.getElementById('p-detail');if(d)d.innerHTML='<div class="empty"><div class="ei">💡</div><p>Preencha os dados para ver o detalhamento.</p></div>';
+}
+
+function gerarProposta(){
+  const nome=document.getElementById('p-nome')?.value||'Empresa';
+  const val=document.getElementById('p-val')?.textContent;
+  if(!val||val==='R$ —'){toast('Calcule o honorário primeiro.','warning');return;}
+  toast(`Proposta gerada para "${nome}" — ${val}/mês`,'success');
+}
+
+function savePricingParams(){
+  PRICING_P.mei=parseInt(document.getElementById('pp-mei').value)||150;
+  PRICING_P.simples=parseInt(document.getElementById('pp-simples').value)||350;
+  PRICING_P.presumido=parseInt(document.getElementById('pp-presumido').value)||650;
+  PRICING_P.real=parseInt(document.getElementById('pp-real').value)||1200;
+  PRICING_P.perFunc=parseInt(document.getElementById('pp-func').value)||45;
+  PRICING_P.perNF=parseInt(document.getElementById('pp-nf').value)||30;
+  toast('Parâmetros de precificação salvos com sucesso!','success');
+}
+
+// ─── REPORTS ─────────────────────────────────────────────────────────────────
+function validateReport(){
+  const c=document.getElementById('r-client').value;
+  return c!=='';
+}
+function generateReport(){
+  const c=document.getElementById('r-client');
+  if(!c.value){c.classList.add('err');toast('Selecione um cliente.','error');return;}
+  c.classList.remove('err');
+  const start=document.getElementById('r-start').value;
+  const end=document.getElementById('r-end').value;
+  const period=start&&end?`${new Date(start).toLocaleDateString('pt-BR')} — ${new Date(end).toLocaleDateString('pt-BR')}`:'Março/2025';
+  document.getElementById('r-area').innerHTML=`
+    <div class="card" style="overflow:hidden">
+      <div class="rp-cov">
+        <div style="font-size:.75rem;opacity:.65;margin-bottom:6px">CONYX ERP CONTÁBIL</div>
+        <h2>${c.value}</h2>
+        <div style="opacity:.65;margin-top:6px;font-size:.82rem">Relatório gerado pelo Conyx</div>
+        <div style="margin-top:14px;background:rgba(255,255,255,.15);display:inline-block;padding:5px 18px;border-radius:20px;font-size:.8rem">Relatório Gerencial · ${period}</div>
+      </div>
+      <div style="padding:22px">
+        <div style="margin-bottom:20px">
+          <h4 style="font-family:'Sora',sans-serif;font-size:.85rem;font-weight:700;color:var(--navy);border-bottom:2px solid var(--accent);display:inline-block;padding-bottom:4px;margin-bottom:10px">Resumo Executivo</h4>
+          <p style="font-size:.82rem;color:var(--g700);line-height:1.7">A empresa apresentou desempenho positivo no período, com crescimento no faturamento em relação ao mês anterior. Os indicadores operacionais estão dentro dos parâmetros esperados para o setor e regime tributário vigente.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+          <div style="text-align:center;padding:12px;background:var(--g50);border-radius:var(--r);border:1px solid var(--g200)"><div style="font-size:1.3rem;font-weight:800;color:var(--navy);font-family:'Sora',sans-serif">R$ 87K</div><div style="font-size:.68rem;color:var(--g400);margin-top:2px">Faturamento</div></div>
+          <div style="text-align:center;padding:12px;background:var(--g50);border-radius:var(--r);border:1px solid var(--g200)"><div style="font-size:1.3rem;font-weight:800;color:var(--green);font-family:'Sora',sans-serif">R$ 32K</div><div style="font-size:.68rem;color:var(--g400);margin-top:2px">Resultado Est.</div></div>
+          <div style="text-align:center;padding:12px;background:var(--g50);border-radius:var(--r);border:1px solid var(--g200)"><div style="font-size:1.3rem;font-weight:800;color:var(--yellow);font-family:'Sora',sans-serif">R$ 42K</div><div style="font-size:.68rem;color:var(--g400);margin-top:2px">Despesas</div></div>
+          <div style="text-align:center;padding:12px;background:var(--g50);border-radius:var(--r);border:1px solid var(--g200)"><div style="font-size:1.3rem;font-weight:800;color:var(--accent);font-family:'Sora',sans-serif">8</div><div style="font-size:.68rem;color:var(--g400);margin-top:2px">Funcionários</div></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <h4 style="font-family:'Sora',sans-serif;font-size:.85rem;font-weight:700;color:var(--navy);border-bottom:2px solid var(--accent);display:inline-block;padding-bottom:4px;margin-bottom:10px">Análise Inteligente</h4>
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:14px">
+            <textarea style="width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.8rem;line-height:1.7;color:var(--g700);resize:vertical;min-height:100px;outline:none">O faturamento cresceu 12% em relação ao período anterior. As despesas representam 48% do faturamento — dentro da faixa esperada para o setor. O custo com pessoal é de 32% do faturamento. A margem estimada de 37% está acima da média do setor para o Simples Nacional. Recomendamos atenção ao crescimento das despesas operacionais nos próximos meses.</textarea>
+          </div>
+          <div style="font-size:.68rem;color:var(--g400);margin-top:4px">✏️ Texto editável — revise antes de gerar o PDF</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="toast('PDF gerado e salvo no histórico!','success')">📥 Gerar PDF</button>
+          <button class="btn btn-secondary" onclick="toast('Relatório exportado em Excel!','success')">📊 Exportar Excel</button>
+          <button class="btn btn-ghost" onclick="toast('E-mail enviado!','info')">📧 Enviar por E-mail</button>
+        </div>
+      </div>
+    </div>`;
+  toast('Relatório gerado com sucesso!','success');
+}
+
+function quickReport(type){
+  const labels={tarefas:'Tarefas por Período',vencidas:'Obrigações Vencidas',produtividade:'Produtividade por Colaborador'};
+  toast(`Relatório "${labels[type]}" disponível em breve.`,'info');
+}
+
+// ─── CONFIG TABS ─────────────────────────────────────────────────────────────
+function cfgTab(item,id){
+  document.querySelectorAll('.cnav-item').forEach(i=>i.classList.remove('active'));
+  item.classList.add('active');
+  document.querySelectorAll('#cfg-content > *').forEach(p=>p.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+// ─── ONB TEMPLATES ────────────────────────────────────────────────────────────
+function renderONBTemplates(){
+  const el=document.getElementById('onb-tpl-list');if(!el)return;
+  const tpls=[
+    {regime:'Simples Nacional',origem:'Transferência',key:'simples_transferencia'},
+    {regime:'Simples Nacional',origem:'Abertura',key:'simples_abertura'},
+    {regime:'Lucro Presumido',origem:'Transferência',key:'presumido_transferencia'},
+    {regime:'Lucro Presumido',origem:'Abertura',key:'presumido_abertura'},
+    {regime:'Lucro Real',origem:'Transferência',key:'real_transferencia'},
+    {regime:'MEI',origem:'Abertura',key:'mei_abertura'},
+  ];
+  el.innerHTML=tpls.map(t=>{
+    const tasks=TASKS_TPL[t.key]||[];
+    return `<div class="sr">
+      <div class="srico">📋</div>
+      <div class="srinfo"><strong>${t.regime} + ${t.origem}</strong><span>${tasks.length} tarefas configuradas</span></div>
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-sm" onclick="toast('Template editado!','success')">✏️ Editar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toast('Template duplicado!','info')">📋 Dup.</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── TEMPLATE MODAL ───────────────────────────────────────────────────────────
+function addTplTask(){
+  const c=document.getElementById('tpl-tasks');
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1fr 110px 70px auto;gap:7px;margin-bottom:7px;align-items:center';
+  d.innerHTML=`
+    <input class="fc" placeholder="Nome da tarefa..." style="font-size:.75rem">
+    <select class="fc" style="font-size:.75rem"><option>Fiscal</option><option>Dep. Pessoal</option><option>Contábil</option><option>Societário</option><option>Geral</option></select>
+    <input class="fc" type="number" placeholder="Dias" style="font-size:.75rem">
+    <button onclick="this.parentElement.remove()" style="background:var(--redl);border:1px solid var(--redb);color:var(--red);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:.9rem">✕</button>`;
+  c.appendChild(d);
+}
+function saveTpl(){closeModal('mo-new-tpl');toast('Template salvo com sucesso!','success');}
+
+// ─── EDIT CLIENT ─────────────────────────────────────────────────────────────
+let _currentProfileId = null;
+function editClient(id) {
+  const c = CLIENTS.find(x => x.id === id);
+  if (!c) return;
+  _currentProfileId = id;
+  document.getElementById('ec-id').value = id;
+  document.getElementById('ec-razao').value = c.razao;
+  document.getElementById('ec-fantasia').value = c.fantasia;
+  document.getElementById('ec-cnpj').value = c.cnpj;
+  document.getElementById('ec-regime').value = c.regime;
+  document.getElementById('ec-origem').value = c.origem;
+  document.getElementById('ec-resp').value = c.resp;
+  document.getElementById('ec-status').value = c.status;
+  openModal('mo-edit-client');
+}
+function editCurrentClient() {
+  if (_currentProfileId) editClient(_currentProfileId);
+}
+function saveEditClient() {
+  const id = parseInt(document.getElementById('ec-id').value);
+  const razao = document.getElementById('ec-razao').value;
+  const cnpj = document.getElementById('ec-cnpj').value;
+  if (!razao || !cnpj) { toast('Preencha os campos obrigatórios.', 'error'); return; }
+  const c = CLIENTS.find(x => x.id === id);
+  if (!c) return;
+  c.razao = razao;
+  c.fantasia = document.getElementById('ec-fantasia').value || razao;
+  c.cnpj = cnpj;
+  c.regime = document.getElementById('ec-regime').value;
+  c.origem = document.getElementById('ec-origem').value;
+  c.resp = document.getElementById('ec-resp').value;
+  c.status = document.getElementById('ec-status').value;
+  renderClients(CLIENTS);
+  // Update profile view if open
+  if (document.getElementById('view-profile').style.display !== 'none') {
+    viewClient(id);
+  }
+  closeModal('mo-edit-client');
+  toast(`Cliente "${c.razao}" atualizado com sucesso!`, 'success');
+}
+
+// ─── VIEW ONB TASKS ─────────────────────────────────────────────────────────
+function viewOnbTasks(clientName, btn) {
+  const row = btn.closest('tr');
+  const existing = row.nextElementSibling;
+  if (existing && existing.classList.contains('onb-task-row')) {
+    existing.remove();
+    btn.textContent = 'Ver Tarefas';
+    return;
+  }
+  const onb = ONB_DATA.find(o => o.client === clientName);
+  const key = onb ? (
+    onb.regime === 'MEI' ? 'mei_abertura' :
+    onb.regime === 'Lucro Real' ? 'real_transferencia' :
+    onb.regime === 'Lucro Presumido' ? 'presumido_transferencia' :
+    'simples_transferencia'
+  ) : 'simples_transferencia';
+  const tasks = TASKS_TPL[key] || [];
+  const tr = document.createElement('tr');
+  tr.className = 'onb-task-row';
+  tr.innerHTML = `<td colspan="8" style="padding:12px 18px;background:var(--g50)">
+    <div style="font-size:.75rem;font-weight:700;color:var(--navy);margin-bottom:8px">Tarefas de Onboarding — ${clientName}</div>
+    ${tasks.map((t,i) => {
+      const done = i < Math.floor(tasks.length * 0.4);
+      return `<div class="ti" style="padding:6px 0">
+        <div class="tck ${done?'done':''}" onclick="toggleTask(this)" style="flex-shrink:0">${done?'✓':''}</div>
+        <div class="tinfo"><div class="tname ${done?'done':''}">${t.name}</div>
+          <div class="tmeta"><span>${DEPT_ICONS[t.dept]||''} ${t.dept}</span><span>Prazo: ${t.days}d</span></div>
+        </div>
+        ${!done?`<select class="fs" style="font-size:.7rem;padding:3px 7px" onchange="taskStatusChange(this)">
+          <option>Pendente</option><option>Em andamento</option><option>Concluído</option>
+        </select>`:`<span class="badge bg" style="font-size:.65rem">✓ Feito</span>`}
+      </div>`;
+    }).join('')}
+  </td>`;
+  row.after(tr);
+  btn.textContent = 'Fechar';
+}
+
+// ─── VIEW OFF TASKS ──────────────────────────────────────────────────────────
+function viewOffTasks(clientName, btn) {
+  const row = btn.closest('tr');
+  const existing = row.nextElementSibling;
+  if (existing && existing.classList.contains('off-task-row')) {
+    existing.remove();
+    btn.textContent = 'Ver';
+    return;
+  }
+  const tasks = [
+    {name:'Comunicar saída ao cliente',dept:'Geral',days:1},
+    {name:'Emitir carta de rescisão',dept:'Societário',days:3},
+    {name:'Verificar obrigações em aberto',dept:'Fiscal',days:5},
+    {name:'Baixar procurações e acessos',dept:'Geral',days:7},
+    {name:'Transferir certificado digital',dept:'Fiscal',days:10},
+    {name:'Entregar documentos físicos',dept:'Geral',days:14},
+    {name:'Emitir recibo de entrega',dept:'Geral',days:14},
+    {name:'Finalizar processo',dept:'Geral',days:30},
+  ];
+  const tr = document.createElement('tr');
+  tr.className = 'off-task-row';
+  tr.innerHTML = `<td colspan="9" style="padding:12px 18px;background:var(--g50)">
+    <div style="font-size:.75rem;font-weight:700;color:var(--navy);margin-bottom:8px">Tarefas de Offboarding — ${clientName}</div>
+    ${tasks.map((t,i) => {
+      const done = i < 3;
+      return `<div class="ti" style="padding:6px 0">
+        <div class="tck ${done?'done':''}" onclick="toggleTask(this)">${done?'✓':''}</div>
+        <div class="tinfo"><div class="tname ${done?'done':''}">${t.name}</div>
+          <div class="tmeta"><span>${DEPT_ICONS[t.dept]||''} ${t.dept}</span><span>Prazo: ${t.days}d</span></div>
+        </div>
+        ${!done?`<select class="fs" style="font-size:.7rem;padding:3px 7px" onchange="taskStatusChange(this)">
+          <option>Pendente</option><option>Em andamento</option><option>Concluído</option>
+        </select>`:`<span class="badge bg" style="font-size:.65rem">✓ Feito</span>`}
+      </div>`;
+    }).join('')}
+  </td>`;
+  row.after(tr);
+  btn.textContent = 'Fechar';
+}
+
+// ─── SAVE INTERACTION (FULL) ─────────────────────────────────────────────────
+function saveInteraction() {
+  const modal = document.getElementById('mo-interaction');
+  const selects = modal.querySelectorAll('select');
+  const textareas = modal.querySelectorAll('textarea');
+  const summary = textareas[0]?.value?.trim();
+  if (!summary) { toast('Preencha o resumo da interação.', 'error'); return; }
+  const client = selects[0]?.value;
+  const tipo = selects[1]?.value;
+  const resp = selects[2]?.value;
+  // Add to REL_DATA
+  const today = new Date().toLocaleDateString('pt-BR');
+  const existing = REL_DATA.find(r => r.client === client);
+  if (existing) {
+    existing.ultima = today;
+    existing.status = 'g';
+    renderRel(REL_DATA);
+  }
+  // If in detail view, add to timeline
+  const tl = document.getElementById('rel-tl');
+  if (tl && document.getElementById('rel-detail').style.display !== 'none') {
+    const newItem = document.createElement('div');
+    newItem.className = 'tli';
+    const inputs = modal.querySelectorAll('input[type="text"], input[type="date"]');
+    const nextStep = inputs[0]?.value || 'Aguardar retorno';
+    newItem.innerHTML = `
+      <div class="tld"></div>
+      <div class="tldate">${today} · ${resp}</div>
+      <div class="tlbox">
+        <div class="tltype">${tipo}</div>
+        <p>${summary}</p>
+        ${nextStep ? `<div class="tlnext">→ ${nextStep}</div>` : ''}
+      </div>`;
+    tl.prepend(newItem);
+  }
+  // Clear form
+  modal.querySelectorAll('textarea').forEach(t => t.value = '');
+  modal.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+  closeModal('mo-interaction');
+  toast('Interação registrada com sucesso!', 'success');
+}
+
+// ─── SAVE OFFBOARDING (FULL) ─────────────────────────────────────────────────
+function saveOffboarding() {
+  const modal = document.getElementById('mo-new-off');
+  const selects = modal.querySelectorAll('select');
+  const client = selects[0]?.value;
+  if (!client) { toast('Selecione um cliente.', 'error'); return; }
+  const tipo = selects[2]?.value;
+  const motivo = selects[3]?.value;
+  if (!motivo) { toast('Selecione o motivo da saída.', 'error'); return; }
+  const today = new Date().toLocaleDateString('pt-BR');
+  const prazo = new Date();
+  prazo.setDate(prazo.getDate() + 45);
+  const newOff = {
+    client, regime: selects[1]?.value || 'Simples Nacional',
+    tipo: tipo || 'Transferência',
+    inicio: today,
+    prazo: prazo.toLocaleDateString('pt-BR'),
+    resp: 'Ana Lima',
+    status: 'andamento',
+    progress: 0
+  };
+  OFF_DATA.unshift(newOff);
+  renderOff(OFF_DATA);
+  // Update client status
+  const c = CLIENTS.find(x => x.razao.includes(client) || client.includes(x.fantasia));
+  if (c) { c.status = 'saida'; renderClients(CLIENTS); }
+  modal.querySelectorAll('select').forEach(s => { if (s.options[0]) s.selectedIndex = 0; });
+  modal.querySelectorAll('textarea').forEach(t => t.value = '');
+  closeModal('mo-new-off');
+  toast(`Offboarding iniciado para "${client}"! Tarefas geradas automaticamente.`, 'success');
+}
+
+// ─── SAVE NEW USER ───────────────────────────────────────────────────────────
+function saveNewUser() {
+  const nome = document.getElementById('nu-nome').value.trim();
+  const email = document.getElementById('nu-email').value.trim();
+  if (!nome || !email) { toast('Preencha nome e e-mail.', 'error'); return; }
+  const perfil = document.getElementById('nu-perfil').value;
+  const labels = {admin:'Admin',gestor:'Gestor',fiscal:'Fiscal',colaborador:'Colab.'};
+  const tbody = document.querySelector('#cfg-users table tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><strong>${nome}</strong></td><td>${email}</td>
+    <td><span class="badge bgr">${labels[perfil]}</span></td>
+    <td><span class="badge ${perfil==='admin'||perfil==='gestor'?'bg':'br'}">${perfil==='admin'||perfil==='gestor'?'✓ Acesso':'✗ Sem acesso'}</span></td>
+    <td><span class="badge bg">Ativo</span></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="toast('Editando usuário...','info')">✏️</button></td>`;
+  tbody?.appendChild(tr);
+  document.getElementById('nu-nome').value = '';
+  document.getElementById('nu-email').value = '';
+  closeModal('mo-new-user');
+  toast(`Usuário "${nome}" criado com sucesso!`, 'success');
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+function initCharts(){
+  new Chart(document.getElementById('ch-status'),{
+    type:'doughnut',
+    data:{labels:['Ativo','Em Implantação','Em Atenção','Em Saída'],
+      datasets:[{data:[412,18,23,5],backgroundColor:['#10b981','#0e7ef7','#ef4444','#f59e0b'],borderWidth:2,borderColor:'#fff'}]},
+    options:{plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:12}}},cutout:'68%',maintainAspectRatio:false}
+  });
+  new Chart(document.getElementById('ch-tasks'),{
+    type:'bar',
+    data:{labels:['Pendente','Em Andamento','Concluído','Atrasado'],
+      datasets:[{data:[58,38,72,31],backgroundColor:['#94a3b8','#0e7ef7','#10b981','#ef4444'],borderRadius:5}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}},maintainAspectRatio:false}
+  });
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+const VALID_USERS = {
+  'admin@conyx.com.br':   {pw:'admin123',   role:'admin',       name:'Ricardo Costa', initials:'RC'},
+  'ana@escritorio.com':    {pw:'gestor123',  role:'gestor',      name:'Ana Lima',      initials:'AL'},
+  'bruno@escritorio.com':  {pw:'fiscal123',  role:'fiscal',      name:'Bruno Carvalho',initials:'BC'},
+  'carla@escritorio.com':  {pw:'colab123',   role:'colaborador', name:'Carla Santos',  initials:'CS'},
+};
+
+function doLogin() {
+  const email = document.getElementById('lp-email').value.trim();
+  const senha = document.getElementById('lp-senha').value;
+  const err = document.getElementById('lp-error');
+  const btn = document.getElementById('lp-submit');
+  const spinner = document.getElementById('lp-spinner');
+  const btnText = document.getElementById('lp-btn-text');
+
+  // Clear errors
+  err.style.display = 'none';
+  document.getElementById('lp-email').classList.remove('error');
+  document.getElementById('lp-senha').classList.remove('error');
+
+  if (!email || !senha) {
+    err.textContent = '❌ Preencha e-mail e senha para continuar.';
+    err.style.display = 'block';
+    if (!email) document.getElementById('lp-email').classList.add('error');
+    if (!senha) document.getElementById('lp-senha').classList.add('error');
+    return;
+  }
+
+  // Loading state
+  spinner.style.display = 'block';
+  btnText.style.opacity = '0';
+  btn.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    const user = VALID_USERS[email.toLowerCase()];
+    if (!user || user.pw !== senha) {
+      spinner.style.display = 'none';
+      btnText.style.opacity = '1';
+      btn.style.pointerEvents = '';
+      err.textContent = '❌ E-mail ou senha inválidos. Tente novamente.';
+      err.style.display = 'block';
+      document.getElementById('lp-senha').classList.add('error');
+      document.getElementById('lp-senha').value = '';
+      document.getElementById('lp-senha').focus();
+      return;
+    }
+    enterERP(user.role, user.initials, user.name);
+  }, 900);
+}
+
+function quickLogin(role, initials, name) {
+  enterERP(role, initials, name);
+}
+
+function enterERP(role, initials, name) {
+  const overlay = document.getElementById('login-overlay');
+  const erp = document.getElementById('erp-app');
+
+  overlay.classList.add('exit');
+  erp.style.display = '';
+
+  // Set role in ERP
+  currentRole = role;
+  const labels = {admin:'Administrador',gestor:'Gestor',fiscal:'Analista Fiscal',colaborador:'Colaborador'};
+  const badges = {admin:'Admin',gestor:'Gestor',fiscal:'Fiscal',colaborador:'Colab.'};
+  document.getElementById('user-av').textContent = initials;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-role').innerHTML = labels[role]+` <span class="role-badge">${badges[role]}</span>`;
+  document.getElementById('role-switcher').value = role;
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    erp.classList.add('visible');
+    // Init charts now that canvas is visible
+    setTimeout(() => {
+      initChartsIfNeeded();
+      renderPrecificacao();
+    }, 100);
+  }, 350);
+}
+
+function togglePw() {
+  const input = document.getElementById('lp-senha');
+  const btn = document.getElementById('lp-pw-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+function lpForgot() {
+  const email = document.getElementById('lp-email').value;
+  if (!email) {
+    document.getElementById('lp-email').focus();
+    document.getElementById('lp-email').classList.add('error');
+    setTimeout(() => document.getElementById('lp-email').classList.remove('error'), 1500);
+    return;
+  }
+  const err = document.getElementById('lp-error');
+  err.style.cssText = 'display:block;background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:#6ee7b7';
+  err.textContent = '✅ Instruções de recuperação enviadas para ' + email;
+  setTimeout(() => { err.style.display = 'none'; err.style.cssText = ''; }, 4000);
+}
+
+// Allow Enter key to submit login
+document.addEventListener('DOMContentLoaded', () => {
+  ['lp-email','lp-senha'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  });
+});
+</script>
+</div><!-- /erp inner flex -->
+</div><!-- /erp-app -->
+</body>
+</html>

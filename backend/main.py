@@ -82,3 +82,78 @@ def get_dashboard_stats():
         "tarefas_atrasadas": 31,
         "tarefas_novas_semana": 5
     }
+
+# Mock Database for Clientes
+MOCK_CLIENTES = [
+    {
+        "id": "1",
+        "razao_social": "Tech Inovações LTDA",
+        "cnpj": "12.345.678/0001-90",
+        "regime": "Lucro Presumido",
+        "origem": "Indicação",
+        "status": "Ativo",
+        "responsavel": "Ana Lima",
+        "entrada": "2023-01-15"
+    },
+    {
+        "id": "2",
+        "razao_social": "Comércio Silva ME",
+        "cnpj": "98.765.432/0001-10",
+        "regime": "Simples Nacional",
+        "origem": "Google",
+        "status": "Em implantação",
+        "responsavel": "Bruno Carvalho",
+        "entrada": "2023-11-05"
+    },
+    {
+        "id": "3",
+        "razao_social": "Agência Criativa S.A",
+        "cnpj": "45.678.901/0001-23",
+        "regime": "Lucro Real",
+        "origem": "Outbound",
+        "status": "Ativo",
+        "responsavel": "Ana Lima",
+        "entrada": "2022-08-20"
+    }
+]
+
+from typing import List, Optional
+
+class ClienteResponse(BaseModel):
+    id: str
+    razao_social: str
+    cnpj: str
+    regime: str
+    origem: str
+    status: str
+    responsavel: str
+    entrada: str
+
+class ClienteCreate(BaseModel):
+    razao_social: str
+    cnpj: str
+    regime: str
+    origem: str
+    responsavel: str
+    status: Optional[str] = "Em implantação"
+
+@app.get("/api/clientes", response_model=List[ClienteResponse])
+def get_clientes():
+    return MOCK_CLIENTES
+
+@app.post("/api/clientes", response_model=ClienteResponse)
+def create_cliente(cliente: ClienteCreate):
+    import uuid
+    import datetime
+    novo = {
+        "id": str(uuid.uuid4()),
+        "razao_social": cliente.razao_social,
+        "cnpj": cliente.cnpj,
+        "regime": cliente.regime,
+        "origem": cliente.origem,
+        "status": cliente.status,
+        "responsavel": cliente.responsavel,
+        "entrada": datetime.date.today().isoformat()
+    }
+    MOCK_CLIENTES.append(novo)
+    return novo
