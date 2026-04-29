@@ -11,10 +11,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 class LoginResponse(BaseModel):
