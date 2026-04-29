@@ -25,16 +25,31 @@ class LoginResponse(BaseModel):
 def read_root():
     return {"message": "Conyx ERP API em execução"}
 
+# Mock Users Database
+MOCK_USERS = {
+    "admin@conyx.com.br": {"password": "admin123", "id": "1", "name": "Administrador", "email": "admin@conyx.com.br", "role": "Administrador (acesso total)"},
+    "ana@escritorio.com": {"password": "gestor123", "id": "2", "name": "Ana", "email": "ana@escritorio.com", "role": "Gestora"},
+    "bruno@escritorio.com": {"password": "fiscal123", "id": "3", "name": "Bruno", "email": "bruno@escritorio.com", "role": "Analista Fiscal"},
+    "carla@escritorio.com": {"password": "colab123", "id": "4", "name": "Carla", "email": "carla@escritorio.com", "role": "Colaborador"}
+}
+
 @app.post("/api/auth/login", response_model=LoginResponse)
-def login(req: LoginRequest):
-    # Mocking authentication logic
-    if req.password == "senha123":
+def login(request: LoginRequest):
+    user_record = MOCK_USERS.get(request.email)
+    
+    if user_record and user_record["password"] == request.password:
         return {
-            "token": "mock-jwt-token-123456",
-            "user": {"name": "Admin", "role": "admin"}
+            "token": f"fake-jwt-token-{user_record['id']}",
+            "user": {
+                "id": user_record["id"],
+                "name": user_record["name"],
+                "email": user_record["email"],
+                "role": user_record["role"]
+            }
         }
+        
     from fastapi import HTTPException
-    raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
 
 class DashboardStatsResponse(BaseModel):
     clientes_ativos: int
