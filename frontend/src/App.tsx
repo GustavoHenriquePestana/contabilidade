@@ -7,14 +7,15 @@ import { Onboarding } from './pages/Onboarding';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ToastContainer } from './components/ToastContainer';
 
+// Função helper para proteger rotas
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { token } = useAuthStore();
+  if (!token) return <Navigate to="/" />;
+  return children;
+};
+
 function App() {
   const { token } = useAuthStore();
-
-  // Função helper para proteger rotas
-  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    if (!token) return <Navigate to="/" />;
-    return children;
-  };
 
   return (
     <>
