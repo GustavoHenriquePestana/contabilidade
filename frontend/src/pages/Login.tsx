@@ -30,8 +30,14 @@ export function Login() {
       });
       
       if (!response.ok) {
-        const errData: AuthError = await response.json();
-        throw new Error(errData.detail || 'Falha no login');
+        let errMessage = 'Falha no login';
+        try {
+          const errData: AuthError = await response.json();
+          errMessage = errData.detail || errMessage;
+        } catch (e) {
+          errMessage = `Servidor indisponível ou offline (Status: ${response.status}). Verifique se o backend Python está rodando.`;
+        }
+        throw new Error(errMessage);
       }
       
       const data: LoginResponse = await response.json();
