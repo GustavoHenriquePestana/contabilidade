@@ -1,0 +1,22 @@
+import { create } from 'zustand';
+import { User } from '../types/auth';
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  login: (user: User, token: string) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  token: null,
+  login: (user, token) => {
+    localStorage.setItem('conyx_token', token);
+    set({ user, token });
+  },
+  logout: () => {
+    localStorage.removeItem('conyx_token');
+    set({ user: null, token: null });
+  },
+}));
