@@ -3,7 +3,7 @@ import { Layout } from '../components/Layout';
 import { DashboardStats } from '../types/dashboard';
 
 const fetchDashboardStats = async (): Promise<DashboardStats> => {
-  const res = await fetch('http://localhost:8000/api/dashboard/stats');
+  const res = await fetch('/api/dashboard/stats');
   if (!res.ok) throw new Error('Falha ao carregar dashboard');
   return res.json();
 };
